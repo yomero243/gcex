@@ -31,8 +31,8 @@ function App() {
   }, []);
 
   return (
-    <div ref={mainRef} className="w-full bg-dark font-orbitron">
-      <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
+    <div ref={mainRef} className="w-full font-orbitron">
+      <div className="fixed top-0 left-0 w-full h-full z-2 pointer-events-none">
         <MouseEffect setMousePosition={setMousePosition} />
         <div className="absolute top-10 left-10">
           <h1 className="text-4xl font-bold text-primary" style={{ textShadow: '0 0 10px #ff9933' }}>Mi Portafolio 3D</h1>
@@ -47,11 +47,14 @@ function App() {
         <Buttons isOpen={isMenuOpen} />
       </div>
 
-      <Canvas className="sticky top-0 left-0 w-full h-screen z-0" camera={{ position: [0, 2, 5], fov: 75 }}>
-        <Experience mousePosition={mousePosition} scrollProgress={scrollProgress} />
-      </Canvas>
+      {/* Container for 3D Canvas and Scrollable Content */}
+      <div className="fixed top-0 left-0 w-full h-screen">
+        <Canvas className="w-full h-full" camera={{ position: [0, 2, 5], fov: 75 }}>
+          <Experience mousePosition={mousePosition} scrollProgress={scrollProgress} />
+        </Canvas>
+      </div>
 
-      <ScrollableContent />
+      <ScrollableContent className="absolute top-0 left-0 w-full" />
     </div>
   );
 }

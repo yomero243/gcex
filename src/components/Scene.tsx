@@ -2,8 +2,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { 
+  useGLTF,
   Center, 
   PerspectiveCamera,
+  useHelper
 } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from "gsap";
@@ -26,26 +28,13 @@ interface CameraPositions {
 }
 
 // Componente para el Cubo
-const Cube: React.FC = () => {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      const time = state.clock.getElapsedTime();
-      meshRef.current.rotation.y = Math.sin(time * 0.5) * 0.2;
-      meshRef.current.rotation.x = Math.sin(time * 0.8) * 0.2;
-    }
-  });
-
-  return (
-    <Center>
-      <mesh ref={meshRef} castShadow>
-        <boxGeometry args={[1.5, 1.5, 1.5]} />
-        <meshStandardMaterial color="#a855f7" roughness={0.5} metalness={0.8} />
-      </mesh>
-    </Center>
-  );
+const EnvironmentModel: React.FC = () => {
+  const { scene } = useGLTF('/Environment1.glb');
+  return <primitive object={scene} />;
 };
+
+useGLTF.preload('/Environment1.glb');
+
 
 // Componente para las luces que resaltan tu figura
 const LightsComponent: React.FC = () => {
@@ -53,6 +42,10 @@ const LightsComponent: React.FC = () => {
   const fillLightRef = useRef<THREE.DirectionalLight>(null);
   const rimLightRef = useRef<THREE.DirectionalLight>(null);
   const spotLightRef = useRef<THREE.SpotLight>(null);
+
+  useHelper(keyLightRef, THREE.DirectionalLightHelper, 1, 'red')
+  useHelper(spotLightRef, THREE.SpotLightHelper, 'cyan')
+
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
@@ -118,14 +111,14 @@ const LightsComponent: React.FC = () => {
         position={[0, 6, 2]}
         target-position={[0, 0, 0]}
         intensity={0.6}
-        color="#a855f7"
+        color="#ffffff"
         angle={Math.PI / 6}
         penumbra={0.5}
         distance={20}
       />
       
       {/* Luz ambiental suave */}
-      <ambientLight intensity={0.15} color="#4c1d95" />
+      <ambientLight intensity={0.15} color="#808080" />
       
       {/* Luz hemisférica para ambiente natural */}
       <hemisphereLight 
@@ -140,12 +133,12 @@ Lights.displayName = 'Lights';
 
 // Posiciones de la cámara enfocadas en tu persona 3D
 const cameraPositions: CameraPositions = {
-  inicio: { x: 0, y: 1, z: 8 },        // Vista frontal de presentación
-  "sobre-mi": { x: 4, y: 1.5, z: 6 },   // Vista ligeramente lateral para mostrar perfil
-  proyectos: { x: -5, y: 2, z: 7 },     // Vista lateral izquierda, mostrando creatividad
-  habilidades: { x: 2, y: 3, z: 5 },    // Vista elevada para mostrar habilidades
-  contacto: { x: -3, y: 0.5, z: 6 },    // Vista más cercana e íntima
-  cv: { x: 0, y: -1, z: 9 }              // Vista completa de cuerpo entero
+  inicio:      { x: 0,  y: 1.5, z: 25 }, // Frontal
+  "sobre-mi":  { x: 2,  y: 1.5, z: 8 },  // Right
+  proyectos:   { x: -2, y: 1.5, z: 4 },  // Left
+  habilidades: { x: 0,  y: 1.5, z: 0 },  // Center
+  contacto:    { x: 0,  y: 1.5, z: -4 }, // Frontal
+  cv:          { x: 0,  y: 1.5, z: -8 }  // End of the hall
 };
 
 // Componente que escucha los eventos de navegación y mueve la cámara
@@ -168,8 +161,8 @@ const CameraControllerComponent: React.FC = () => {
         duration: 2,
         ease: "power3.inOut",
         onUpdate: () => {
-          // Rotación dinámica hacia el modelo
-          camera.lookAt(0, 0, 0);
+          // Forzar a la cámara a mirar siempre hacia adelante en el eje Z
+          camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 1);
         }
       });
     };
@@ -187,81 +180,17 @@ const CameraControllerComponent: React.FC = () => {
 const CameraController = React.memo(CameraControllerComponent);
 CameraController.displayName = 'CameraController';
 
-// Componente para el fondo con gradiente animado
-const AnimatedBackground: React.FC = () => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    
-    if (meshRef.current) {
-      // Rotación lenta del fondo
-      meshRef.current.rotation.z = time * 0.02;
-      meshRef.current.rotation.x = Math.sin(time * 0.01) * 0.1;
-    }
-    
-    if (materialRef.current) {
-      materialRef.current.uniforms.time.value = time;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 0, -50]} scale={[100, 100, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <shaderMaterial
-        ref={materialRef}
-        uniforms={{
-          time: { value: 0 },
-        }}
-        vertexShader={`
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `}
-        fragmentShader={`
-          uniform float time;
-          varying vec2 vUv;
-          
-          void main() {
-            vec2 uv = vUv;
-            
-            // Gradiente base con colores más vibrantes
-            vec3 color1 = vec3(0.15, 0.1, 0.35);
-            vec3 color2 = vec3(0.3, 0.15, 0.6);
-            vec3 color3 = vec3(0.1, 0.2, 0.5);
-            
-            // Efectos ondulantes más complejos
-            float wave1 = sin(uv.x * 8.0 + time * 0.8) * 0.15;
-            float wave2 = cos(uv.y * 6.0 + time * 0.6) * 0.15;
-            float wave3 = sin((uv.x + uv.y) * 4.0 + time * 0.4) * 0.1;
-            
-            vec3 color = mix(color1, color2, uv.y + wave1);
-            color = mix(color, color3, uv.x + wave2 + wave3);
-            
-            // Añadir brillo sutil
-            color += vec3(0.05) * sin(time * 2.0 + uv.x * 20.0) * sin(time * 1.5 + uv.y * 15.0);
-            
-            gl_FragColor = vec4(color, 1.0);
-          }
-        `}
-      />
-    </mesh>
-  );
-};
-
 const Scene: React.FC = () => {
   return (
     <>
-      <AnimatedBackground />
+      <axesHelper args={[5]} />
+      <gridHelper args={[20, 20]} />
       <PerspectiveCamera makeDefault position={[0, 2, 12]} fov={75} near={0.1} far={1000} />
       <Lights />
-      <Cube />
+      <EnvironmentModel />
       <CameraController />
       {/* Efectos de post-procesamiento */}
-      <fog attach="fog" args={['#1a1a2e', 20, 100]} />
+      <fog attach="fog" args={['#101010', 20, 100]} />
     </>
   );
 };
