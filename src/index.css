@@ -1,13 +1,40 @@
 @import "tailwindcss";
 
-@theme {
+:root {
   --color-primary: #ff9933;
   --color-secondary: #00ffff;
   --color-dark: #1a1a1a;
   --color-light: #f0f0f0;
-  --font-orbitron: 'Orbitron', 'sans-serif';
+  --font-wix-display: "Wix Madefor Display", sans-serif;
+  --font-wix-text: "Wix Madefor Text", sans-serif;
 }
 
+/* Set app default font to Wix Madefor Text for better legibility */
 html, body {
   background-color: transparent;
+  font-family: var(--font-wix-text);
+  font-optical-sizing: auto;
+  font-weight: 400;
+}
+
+/* Helper class for display headings. Use with a unique suffix if you need per-instance weights. */
+.wix-madefor-display {
+  font-family: var(--font-wix-display);
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+/* Weight utilities for Wix Madefor Display / Text. Tailor weights as needed. */
+.wix-weight-400 { font-weight: 400; }
+.wix-weight-500 { font-weight: 500; }
+.wix-weight-600 { font-weight: 600; }
+.wix-weight-700 { font-weight: 700; }
+.wix-weight-800 { font-weight: 800; }
+
+/* Example variant mimicking the user's pattern: .wix-madefor-display-<uniquifier> */
+.wix-madefor-display-1 {
+  font-family: var(--font-wix-display);
+  font-optical-sizing: auto;
+  font-weight: 700; /* change to desired weight */
+  font-style: normal;
 }
