@@ -3,9 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { 
   useGLTF,
-  Center, 
-  PerspectiveCamera,
-  useHelper
+  PerspectiveCamera
 } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from "gsap";
@@ -35,6 +33,27 @@ const EnvironmentModel: React.FC = () => {
 
 useGLTF.preload('/Environment1.glb');
 
+// Constantes para la animación de las luces
+const lightAnimationConfig = {
+  keyLight: {
+    baseX: 3, y: 4, baseZ: 5,
+    oscillationSpeed: 0.3,
+    xAmplitude: 1,
+    zAmplitude: 0.5,
+    intensityBase: 1.2,
+    intensitySpeed: 1.5,
+    intensityAmplitude: 0.2,
+  },
+  fillLight: {
+    intensityBase: 0.4, intensitySpeed: 0.8, intensityAmplitude: 0.1,
+  },
+  rimLight: {
+    baseX: -4, oscillationSpeed: 0.4, xAmplitude: 0.5, intensityBase: 0.8, intensitySpeed: 2, intensityAmplitude: 0.3,
+  },
+  spotLight: {
+    baseY: 6, ySpeed: 0.5, yAmplitude: 0.5, intensityBase: 0.6, intensitySpeed: 1.2, intensityAmplitude: 0.2,
+  }
+};
 
 // Componente para las luces que resaltan tu figura
 const LightsComponent: React.FC = () => {
@@ -43,36 +62,38 @@ const LightsComponent: React.FC = () => {
   const rimLightRef = useRef<THREE.DirectionalLight>(null);
   const spotLightRef = useRef<THREE.SpotLight>(null);
 
-  useHelper(keyLightRef, THREE.DirectionalLightHelper, 1, 'red')
-  useHelper(spotLightRef, THREE.SpotLightHelper, 'cyan')
+  // Helpers para debugging (comentados para evitar errores de tipo)
+  // useHelper(keyLightRef, THREE.DirectionalLightHelper, 1)
+  // useHelper(spotLightRef, THREE.SpotLightHelper)
 
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
+    const { keyLight, fillLight, rimLight, spotLight } = lightAnimationConfig;
     
     // Luz principal que sigue tu figura
     if (keyLightRef.current) {
-      keyLightRef.current.position.x = 3 + Math.sin(time * 0.3) * 1;
-      keyLightRef.current.position.y = 4;
-      keyLightRef.current.position.z = 5 + Math.cos(time * 0.3) * 0.5;
-      keyLightRef.current.intensity = 1.2 + Math.sin(time * 1.5) * 0.2;
+      keyLightRef.current.position.x = keyLight.baseX + Math.sin(time * keyLight.oscillationSpeed) * keyLight.xAmplitude;
+      keyLightRef.current.position.y = keyLight.y;
+      keyLightRef.current.position.z = keyLight.baseZ + Math.cos(time * keyLight.oscillationSpeed) * keyLight.zAmplitude;
+      keyLightRef.current.intensity = keyLight.intensityBase + Math.sin(time * keyLight.intensitySpeed) * keyLight.intensityAmplitude;
     }
     
     // Luz de relleno suave
     if (fillLightRef.current) {
-      fillLightRef.current.intensity = 0.4 + Math.sin(time * 0.8) * 0.1;
+      fillLightRef.current.intensity = fillLight.intensityBase + Math.sin(time * fillLight.intensitySpeed) * fillLight.intensityAmplitude;
     }
 
     // Luz de contorno para crear silueta dramática
     if (rimLightRef.current) {
-      rimLightRef.current.position.x = -4 + Math.cos(time * 0.4) * 0.5;
-      rimLightRef.current.intensity = 0.8 + Math.sin(time * 2) * 0.3;
+      rimLightRef.current.position.x = rimLight.baseX + Math.cos(time * rimLight.oscillationSpeed) * rimLight.xAmplitude;
+      rimLightRef.current.intensity = rimLight.intensityBase + Math.sin(time * rimLight.intensitySpeed) * rimLight.intensityAmplitude;
     }
 
     // Spotlight dinámico desde arriba
     if (spotLightRef.current) {
-      spotLightRef.current.intensity = 0.6 + Math.sin(time * 1.2) * 0.2;
-      spotLightRef.current.position.y = 6 + Math.sin(time * 0.5) * 0.5;
+      spotLightRef.current.intensity = spotLight.intensityBase + Math.sin(time * spotLight.intensitySpeed) * spotLight.intensityAmplitude;
+      spotLightRef.current.position.y = spotLight.baseY + Math.sin(time * spotLight.ySpeed) * spotLight.yAmplitude;
     }
   });
 
@@ -131,14 +152,14 @@ const LightsComponent: React.FC = () => {
 const Lights = React.memo(LightsComponent);
 Lights.displayName = 'Lights';
 
-// Posiciones de la cámara enfocadas en tu persona 3D
+// Posiciones de la cámara en un pasillo lineal
 const cameraPositions: CameraPositions = {
-  inicio:      { x: 0,  y: 1.5, z: 25 }, // Frontal
-  "sobre-mi":  { x: 2,  y: 1.5, z: 8 },  // Right
-  proyectos:   { x: -2, y: 1.5, z: 4 },  // Left
-  habilidades: { x: 0,  y: 1.5, z: 0 },  // Center
-  contacto:    { x: 0,  y: 1.5, z: -4 }, // Frontal
-  cv:          { x: 0,  y: 1.5, z: -8 }  // End of the hall
+  inicio:      { x: 0,  y: 1.5, z: 2 },    // Entrada del pasillo
+  "sobre-mi":  { x: 0,  y: 1.5, z: -2 },   // Primera estación
+  proyectos:   { x: 0,  y: 1.5, z: -8 },   // Segunda estación
+  habilidades: { x: 0,  y: 1.5, z: -14 },  // Tercera estación
+  contacto:    { x: 0,  y: 1.5, z: -20 },  // Cuarta estación
+  cv:          { x: 0,  y: 1.5, z: -50 }   // Final del pasillo (más profundo)
 };
 
 // Componente que escucha los eventos de navegación y mueve la cámara
@@ -153,16 +174,16 @@ const CameraControllerComponent: React.FC = () => {
       
       if (!position) return;
 
-      // Animación más dramática con rotación de cámara
+      // Animación suave para navegación en pasillo
       gsap.to(camera.position, {
         x: position.x,
         y: position.y,
         z: position.z,
-        duration: 2,
-        ease: "power3.inOut",
+        duration: 1.2,
+        ease: "power2.inOut",
         onUpdate: () => {
-          // Forzar a la cámara a mirar siempre hacia adelante en el eje Z
-          camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 1);
+          // La cámara mira hacia adelante en el pasillo
+          camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 5);
         }
       });
     };
@@ -183,9 +204,9 @@ CameraController.displayName = 'CameraController';
 const Scene: React.FC = () => {
   return (
     <>
-      <axesHelper args={[5]} />
-      <gridHelper args={[20, 20]} />
-      <PerspectiveCamera makeDefault position={[0, 2, 12]} fov={75} near={0.1} far={1000} />
+      <axesHelper args={[10]} />
+      <gridHelper args={[50, 50]} />
+      <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={75} near={0.1} far={1000} />
       <Lights />
       <EnvironmentModel />
       <CameraController />

@@ -1,11 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import gsap from "gsap";
-
-interface ButtonItem {
-  id: string;
-  label: string;
-  emoji: string;
-}
+import React, { useState } from 'react';
 
 interface ButtonsProps {
   isOpen: boolean;
@@ -13,101 +6,78 @@ interface ButtonsProps {
 
 const Buttons: React.FC<ButtonsProps> = ({ isOpen }) => {
   const [activeSection, setActiveSection] = useState<string>("inicio");
-  const buttonsRef = useRef<HTMLDivElement>(null);
-  const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
   const handleNavigation = (section: string): void => {
     setActiveSection(section);
-    
-    // Emitir un evento personalizado que los componentes R3F pueden escuchar
-    window.dispatchEvent(new CustomEvent('camera-navigation', { 
-      detail: { section } 
+    window.dispatchEvent(new CustomEvent('camera-navigation', {
+      detail: { section }
     }));
   };
 
   const getButtonClasses = (section: string): string => {
-    return `flex items-center justify-start w-full px-4 py-3 text-sm font-medium rounded-lg ${
-      activeSection === section 
-      ? "bg-primary text-dark shadow-lg shadow-primary/50 [text-shadow:0_0_10px_var(--tw-shadow-color)]" 
-      : "text-light hover:bg-primary/50 hover:text-dark"
+    return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium ${
+      activeSection === section
+      ? "bg-gray-100 text-gray-700"
+      : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
     }`;
   };
 
-  const buttons: ButtonItem[] = [
-    { id: "inicio", label: "Inicio", emoji: "🏠" },
-    { id: "sobre-mi", label: "Sobre mí", emoji: "👨‍💻" },
-    { id: "proyectos", label: "Proyectos", emoji: "🚀" },
-    { id: "habilidades", label: "Habilidades", emoji: "💪" },
-    { id: "contacto", label: "Contacto", emoji: "📧" },
-    { id: "cv", label: "CV", emoji: "📄" }
+  const buttons = [
+    { id: "inicio", label: "Inicio" },
+    { id: "sobre-mi", label: "Sobre mí" },
+    { id: "proyectos", label: "Proyectos" },
+    { id: "habilidades", label: "Habilidades" },
+    { id: "contacto", label: "Contacto" },
+    { id: "cv", label: "CV" }
   ];
 
-  useEffect(() => {
-    // Animación de entrada de los botones
-    if (isOpen && buttonsRef.current && buttonRefs.current.length > 0) {
-      gsap.fromTo(buttonRefs.current, 
-        { 
-          x: -100, 
-          opacity: 0,
-          scale: 0.8
-        },
-        { 
-          x: 0, 
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          ease: "back.out(1.7)",
-          stagger: 0.1,
-          delay: 0.2
-        }
-      );
-    }
-  }, [isOpen]);
-
   return (
-    <div 
-      ref={buttonsRef}
+    <div
       className={`
-        absolute top-0 left-0 h-screen flex flex-col justify-between w-64
-        bg-dark/30 backdrop-blur-xl border-r border-primary/40 font-orbitron
+        absolute top-0 right-0 h-screen
         transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${isOpen ? 'translate-x-0' : 'translate-x-full'}
       `}
-      style={{ 
+      style={{
         pointerEvents: 'auto',
       }}
     >
-      <div className="px-4 py-6">
-        <span className={`
-          grid place-content-center rounded-lg bg-primary/20 text-xs text-light
-          h-12 w-full
-        `}>
-          GCEX
-        </span>
+      <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white w-64">
+        <div className="px-4 py-6">
+          <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+            GCEX
+          </span>
 
-        <ul className="mt-8 space-y-2">
-          {buttons.map(({ id, label, emoji }, index) => (
-            <li key={id}>
-              <button
-                ref={(el) => {
-                  if (el) buttonRefs.current[index] = el;
-                }}
-                onClick={() => handleNavigation(id)}
-                className={getButtonClasses(id)}
-                aria-label={`Navigate to ${label}`}
-              >
-                <span className="text-2xl w-10 text-center">{emoji}</span>
-                <span className="ml-4">
+          <ul className="mt-6 space-y-1">
+            {buttons.map(({ id, label }) => (
+              <li key={id}>
+                <button
+                  onClick={() => handleNavigation(id)}
+                  className={getButtonClasses(id)}
+                >
                   {label}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <div className="sticky inset-x-0 bottom-0 border-t border-primary/20 p-4">
-        {/* Contenido del footer si lo necesitas */}
+        <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
+          <a href="#" className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
+            <img
+              alt="Jose Gabriel Cerdio Oyarzabal"
+              src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+              className="size-10 rounded-full object-cover"
+            />
+
+            <div>
+              <p className="text-xs">
+                <strong className="block font-medium">Jose Gabriel Cerdio Oyarzabal</strong>
+                <span>j.g.cerdio@email.com</span>
+              </p>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   );
