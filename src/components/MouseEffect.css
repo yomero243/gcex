@@ -2,8 +2,8 @@
     position: fixed;
     width: 24px;
     height: 24px;
-    background-color: rgba(0, 255, 255, 0.2);
-    border: 2px solid rgba(0, 255, 255, 0.4);
+    background-color: rgba(82, 160, 14, 0.2);
+    border: 2px solid rgba(82, 160, 14, 0.4);
     border-radius: 50%;
     pointer-events: none;
     transform: translate3d(-50%, -50%, 0);
@@ -24,7 +24,7 @@
     left: 50%;
     width: 4px;
     height: 4px;
-    background-color: rgba(0, 255, 255, 0.8);
+    background-color: rgba(82, 160, 14, 0.8);
     border-radius: 50%;
     transform: translate3d(-50%, -50%, 0);
 }

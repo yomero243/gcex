@@ -6,14 +6,40 @@ import MouseEffect from './components/MouseEffect';
 import ScrollableContent from './components/ScrollableContent';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 function App() {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [currentScrollSection, setCurrentScrollSection] = useState('inicio');
+  const [activeSection, _setActiveSection] = useState('inicio');
   const mainRef = useRef(null);
+  const isNavigating = useRef(false);
+  const activeSectionRef = useRef(activeSection);
+
+  const setActiveSection = (section: string) => {
+    activeSectionRef.current = section;
+    _setActiveSection(section);
+  };
+
+  const handleNavigation = (section: string) => {
+    isNavigating.current = true;
+    setActiveSection(section);
+
+    window.dispatchEvent(new CustomEvent('camera-navigation', { 
+      detail: { section: section } 
+    }));
+
+    gsap.to(window, { 
+      scrollTo: { y: `#${section}`, offsetY: 70 }, 
+      duration: 1, 
+      ease: 'power2.inOut',
+      onComplete: () => {
+        isNavigating.current = false;
+      }
+    });
+  };
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -23,38 +49,31 @@ function App() {
         end: 'bottom bottom',
         scrub: 1,
         onUpdate: (self) => {
+          if (isNavigating.current) return;
+
           setScrollProgress(self.progress);
           
-          // Mapear el progreso del scroll a las secciones de manera más precisa
           const sections = ['inicio', 'sobre-mi', 'proyectos', 'habilidades', 'contacto', 'cv'];
           const totalSections = sections.length;
-          
-          // Calcular el índice de la sección actual basado en el progreso
           let sectionIndex = Math.floor(self.progress * totalSections);
-          
-          // Asegurar que no excedamos el array
           sectionIndex = Math.min(sectionIndex, totalSections - 1);
           
-          // Solo cambiar si es una sección diferente
           const currentSection = sections[sectionIndex];
           
-          // Solo emitir evento si la sección cambió
-          if (currentSection !== currentScrollSection) {
-            setCurrentScrollSection(currentSection);
+          if (currentSection !== activeSectionRef.current) {
+            setActiveSection(currentSection);
             
-            // Emitir evento de navegación de cámara basado en scroll
             window.dispatchEvent(new CustomEvent('camera-navigation', { 
               detail: { section: currentSection } 
             }));
             
-            // Debug: mostrar en consola
             console.log(`Scroll: ${(self.progress * 100).toFixed(1)}% → Sección: ${currentSection}`);
           }
         },
       });
     }, mainRef);
     return () => ctx.revert();
-  }, [currentScrollSection]);
+  }, []);
 
   return (
     <div ref={mainRef} className="w-full font-orbitron">
@@ -72,7 +91,7 @@ function App() {
             {isMenuOpen ? 'Cerrar' : 'Menú'}
           </button>
         </div>
-        <Buttons isOpen={isMenuOpen} />
+        <Buttons isOpen={isMenuOpen} activeSection={activeSection} onNavigate={handleNavigation} />
       </div>
 
       {/* Container for 3D Canvas and Scrollable Content */}

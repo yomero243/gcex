@@ -44,7 +44,7 @@ const ParticlesInstance: React.FC = () => {
 
       particlesData.current.sizes[i] = Math.random() * 0.3 + 0.1;
       // Dar lifetime inicial para que las partículas sean visibles desde el inicio
-      particlesData.current.lifetimes[i] = Math.random() * 60 + 30;
+      particlesData.current.lifetimes[i] = -Math.random() * 60;
     }
   }, [viewport]);
 
@@ -88,7 +88,7 @@ const ParticlesInstance: React.FC = () => {
     
     const mousePos = new THREE.Vector3();
     state.raycaster.setFromCamera(mouse2D.current, camera);
-    state.raycaster.ray.at(5, mousePos);
+    state.raycaster.ray.at(4, mousePos);
 
     const { positions, velocities, lifetimes, count } = particlesData.current;
 
@@ -145,7 +145,7 @@ const ParticlesInstance: React.FC = () => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.08}
+        size={0.02}
         sizeAttenuation
         vertexColors
         transparent
@@ -153,7 +153,7 @@ const ParticlesInstance: React.FC = () => {
         map={textureRef.current}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        color={0xffffff}
+        color={0x9bc70b}
       />
     </points>
   );
