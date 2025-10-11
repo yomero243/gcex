@@ -27,11 +27,11 @@ interface CameraPositions {
 
 // Componente para el Cubo
 const EnvironmentModel: React.FC = () => {
-  const { scene } = useGLTF('/Environment1.glb');
+  const { scene } = useGLTF('/Environment2.glb');
   return <primitive object={scene} />;
 };
 
-useGLTF.preload('/Environment1.glb');
+useGLTF.preload('/Environment2.glb');
 
 // Constantes para la animación de las luces
 const lightAnimationConfig = {
