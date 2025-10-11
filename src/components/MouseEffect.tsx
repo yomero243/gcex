@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import "./MouseEffect.css";
+import { mouseState } from "../utils/mouseState";
 
 // Elementos que deberían activar efecto hover
 const INTERACTIVE_ELEMENTS = new Set(['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA']);
@@ -9,15 +10,11 @@ let lastMouseX = 0;
 let lastMouseY = 0;
 let lastUpdateTime = performance.now();
 
-interface MouseEffectProps {
-  setMousePosition: (position: { x: number; y: number }) => void;
-}
-
 /**
  * Componente que crea un efecto de cursor personalizado
  * @returns {JSX.Element} Componente de efecto de cursor
  */
-const MouseEffect: React.FC<MouseEffectProps> = ({ setMousePosition }) => {
+const MouseEffect: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const mousePosition = useRef({ x: 0, y: 0 });
   const rafId = useRef<number | null>(null);
@@ -74,7 +71,8 @@ const MouseEffect: React.FC<MouseEffectProps> = ({ setMousePosition }) => {
       lastMouseY = event.clientY;
       lastUpdateTime = currentTime;
 
-      setMousePosition({ x: event.clientX, y: event.clientY });
+      mouseState.x = event.clientX;
+      mouseState.y = event.clientY;
     }
   }, []);
 

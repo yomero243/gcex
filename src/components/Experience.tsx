@@ -5,11 +5,10 @@ import Particles from './Particles';
 import { useFrame } from '@react-three/fiber';
 
 interface ExperienceProps {
-  mousePosition: { x: number; y: number };
   scrollProgress: number;
 }
 
-const Experience: React.FC<ExperienceProps> = ({ mousePosition, scrollProgress }) => {
+const Experience: React.FC<ExperienceProps> = ({ scrollProgress }) => {
   return (
     <>
       {/* Luces y Entorno */}
@@ -20,7 +19,7 @@ const Experience: React.FC<ExperienceProps> = ({ mousePosition, scrollProgress }
       
       {/* Objetos 3D */}
       <Scene />
-      <Particles mousePosition={mousePosition} />
+      <Particles />
     </>
   );
 };

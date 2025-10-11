@@ -11,7 +11,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 function App() {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [currentScrollSection, setCurrentScrollSection] = useState('inicio');
   const mainRef = useRef(null);
@@ -60,7 +59,7 @@ function App() {
   return (
     <div ref={mainRef} className="w-full font-orbitron">
       <div className="fixed top-0 left-0 w-full h-full z-2 pointer-events-none">
-        <MouseEffect setMousePosition={setMousePosition} />
+        <MouseEffect />
         <div className="absolute top-10 left-0 w-full flex justify-between items-center px-10">
           <div>
             <h1 className="text-4xl font-bold text-primary" style={{ textShadow: '0 0 10px #ff9933' }}>Mi Portafolio 3D</h1>
@@ -79,7 +78,7 @@ function App() {
       {/* Container for 3D Canvas and Scrollable Content */}
       <div className="fixed top-0 left-0 w-full h-screen">
         <Canvas className="w-full h-full">
-          <Experience mousePosition={mousePosition} scrollProgress={scrollProgress} />
+          <Experience scrollProgress={scrollProgress} />
         </Canvas>
       </div>
 
