@@ -17,8 +17,8 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen }) => {
   const getButtonClasses = (section: string): string => {
     return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium ${
       activeSection === section
-      ? "bg-gray-100 text-gray-700"
-      : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+      ? "bg-gray-100/50 text-gray-700"
+      : "text-gray-500 hover:bg-gray-100/50 hover:text-gray-700"
     }`;
   };
 
@@ -42,9 +42,9 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen }) => {
         pointerEvents: 'auto',
       }}
     >
-      <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white w-64">
+      <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white/30 backdrop-blur-[8px] w-64">
         <div className="px-4 py-6">
-          <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+          <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100/30 text-xs text-gray-600">
             GCEX
           </span>
 
@@ -63,7 +63,7 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen }) => {
         </div>
 
         <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-          <a href="#" className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
+          <a href="#" className="flex items-center gap-2 bg-white/30 p-4 hover:bg-gray-50/50">
             <img
               alt="Jose Gabriel Cerdio Oyarzabal"
               src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
