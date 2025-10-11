@@ -13,7 +13,7 @@ const ScrollableContent: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <div className={`${className} flex flex-col items-center`}>
       {sections.map((section) => (
-        <div key={section.id} className="h-[100vh] w-full flex items-center justify-center">
+        <div key={section.id} id={section.id} className="h-[100vh] w-full flex items-center justify-center">
           <div className="w-1/2 p-10 rounded-lg bg-dark/50 backdrop-blur-sm">
             <h2 className="text-2xl font-bold text-light text-center">{section.title}</h2>
             <p className="text-light/80 mt-4 text-center">{section.content}</p>

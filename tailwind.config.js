@@ -1,1 +1,44 @@
-export default {}
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        dark: 'var(--color-dark)',
+        black: 'var(--color-black)',
+        'black-2': 'var(--color-black-2)',
+        'kelly-green': 'var(--kelly-green)',
+        'pakistan-green': 'var(--pakistan-green)',
+        'yellow-green': 'var(--yellow-green)',
+        'gray-50': 'var(--color-gray-50)',
+        'gray-100': 'var(--color-gray-100)',
+        'gray-500': 'var(--color-gray-500)',
+        'gray-600': 'var(--color-gray-600)',
+        'gray-700': 'var(--color-gray-700)',
+        'white': 'var(--color-white)'
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)'],
+        mono: ['var(--font-mono)'],
+        wix: ['var(--font-wix-text)', 'var(--font-sans)']
+      },
+      backgroundImage: {
+        'gradient-top': 'var(--gradient-top)',
+        'gradient-right': 'var(--gradient-right)',
+        'gradient-bottom': 'var(--gradient-bottom)',
+        'gradient-left': 'var(--gradient-left)',
+        'gradient-top-right': 'var(--gradient-top-right)',
+        'gradient-bottom-right': 'var(--gradient-bottom-right)',
+        'gradient-top-left': 'var(--gradient-top-left)',
+        'gradient-bottom-left': 'var(--gradient-bottom-left)',
+        'gradient-radial': 'var(--gradient-radial)'
+      }
+    },
+  },
+  plugins: [],
+}

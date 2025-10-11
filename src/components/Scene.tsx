@@ -99,51 +99,115 @@ const LightsComponent: React.FC = () => {
 
   return (
     <group>
-      {/* Luz principal (Key Light) */}
+      {/* Luz principal (Key Light) - Cian */}
       <directionalLight 
         ref={keyLightRef}
         position={[3, 4, 5]} 
-        intensity={1.2} 
-        color="#ffffff"
+        intensity={1.5} 
+        color="#00ffff" // Cian
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
       
-      {/* Luz de relleno (Fill Light) */}
+      {/* Luz de relleno (Fill Light) - Magenta */}
       <directionalLight 
         ref={fillLightRef}
         position={[-2, 2, 3]} 
-        intensity={0.4} 
-        color="#e0e7ff"
+        intensity={0.8} 
+        color="#ff00ff" // Magenta
       />
       
-      {/* Luz de contorno (Rim Light) */}
+      {/* Luz de contorno (Rim Light) - Amarillo neón */}
       <directionalLight 
         ref={rimLightRef}
         position={[-4, 3, -2]} 
-        intensity={0.8} 
-        color="#fbbf24"
+        intensity={1.2} 
+        color="#ffff00" // Amarillo
       />
       
-      {/* Spotlight desde arriba */}
+      {/* Spotlight Volumétrico 1 - Morado */}
       <spotLight
         ref={spotLightRef}
-        position={[0, 6, 2]}
-        target-position={[0, 0, 0]}
-        intensity={0.6}
+        position={[0, 8, -10]}
+        target-position={[0, 0, -10]}
+        intensity={2}
+        color="#8A2BE2" // Morado
+        angle={Math.PI / 8}
+        penumbra={0.7}
+        distance={30}
+        castShadow
+      />
+
+      {/* Spotlight Volumétrico 2 - Azul profundo */}
+      <spotLight
+        position={[5, 6, -20]}
+        target-position={[0, 0, -20]}
+        intensity={2}
+        color="#0000ff" // Azul
+        angle={Math.PI / 9}
+        penumbra={0.8}
+        distance={40}
+      />
+      
+      {/* Luz ambiental muy tenue para no tener negros absolutos */}
+      <ambientLight intensity={0.1} color="#4b0082" /> 
+      
+      {/* Luz hemisférica para un toque de color en las sombras */}
+      <hemisphereLight 
+        args={["#ff00ff", "#00ffff", 0.3]} // De magenta a cian
+      />
+
+      {/* Spotlights adicionales para el pasillo */}
+      <spotLight
+        position={[0, 10, 2]} // Inicio
+        target-position={[0, 0, 2]}
+        intensity={1}
         color="#ffffff"
         angle={Math.PI / 6}
         penumbra={0.5}
         distance={20}
+        castShadow
       />
-      
-      {/* Luz ambiental suave */}
-      <ambientLight intensity={0.15} color="#808080" />
-      
-      {/* Luz hemisférica para ambiente natural */}
-      <hemisphereLight 
-        args={["#ddd6fe", "#1e1b4b", 0.2]}
+      <spotLight
+        position={[0, 10, -2]} // Sobre mí
+        target-position={[0, 0, -2]}
+        intensity={1}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={20}
+        castShadow
+      />
+      <spotLight
+        position={[0, 10, -8]} // Proyectos
+        target-position={[0, 0, -8]}
+        intensity={1}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={20}
+        castShadow
+      />
+      <spotLight
+        position={[0, 10, -14]} // Habilidades
+        target-position={[0, 0, -14]}
+        intensity={1}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={20}
+        castShadow
+      />
+      <spotLight
+        position={[0, 10, -20]} // Contacto
+        target-position={[0, 0, -20]}
+        intensity={1}
+        color="#ffffff"
+        angle={Math.PI / 6}
+        penumbra={0.5}
+        distance={20}
+        castShadow
       />
     </group>
   );
@@ -204,14 +268,13 @@ CameraController.displayName = 'CameraController';
 const Scene: React.FC = () => {
   return (
     <>
-      <axesHelper args={[10]} />
-      <gridHelper args={[50, 50]} />
+
       <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={75} near={0.1} far={1000} />
       <Lights />
       <EnvironmentModel />
       <CameraController />
       {/* Efectos de post-procesamiento */}
-      <fog attach="fog" args={['#101010', 20, 100]} />
+      <fog attach="fog" args={['#a7c7e7', 25, 80]} />
     </>
   );
 };
