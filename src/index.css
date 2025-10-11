@@ -1,10 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* System fonts */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
   /* Utility / scale variables */
   --spacing: 0.25rem;
   --text-xs: 0.75rem;
@@ -23,8 +19,6 @@
   --blur-sm: 8px;
   --default-transition-duration: 150ms;
   --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  --default-font-family: var(--font-sans);
-  --default-mono-font-family: var(--font-mono);
 
   /* Gray scale (OKLCH provided) */
   --color-gray-50: oklch(98.5% 0.002 247.839);
@@ -45,8 +39,6 @@
   --color-dark: #073906ff; /* pakistan-green */
   --color-black: #000000ff;
   --color-black-2: #010000ff;
-  --font-wix-display: "Wix Madefor Display", sans-serif;
-  --font-wix-text: "Wix Madefor Text", sans-serif;
 
   /* New named palette (HEX) */
   --kelly-green-hex: #52a00eff;
@@ -79,16 +71,6 @@
   --gradient-top-left: linear-gradient(225deg, var(--kelly-green), var(--pakistan-green), var(--black), var(--black-2), var(--yellow-green));
   --gradient-bottom-left: linear-gradient(315deg, var(--kelly-green), var(--pakistan-green), var(--black), var(--black-2), var(--yellow-green));
   --gradient-radial: radial-gradient(circle, var(--kelly-green), var(--pakistan-green), var(--black), var(--black-2), var(--yellow-green));
-}
-
-/* Set app default font to Wix Madefor Text for better legibility */
-html, body {
-  background-color: transparent;
-  font-family: var(--font-wix-text);
-  font-optical-sizing: auto;
-  font-weight: 400;
-  -webkit-text-size-adjust: 100%;
-  tab-size: 4;
 }
 
 /* Provide sane defaults for typographic utilities (Tailwind will map to these vars) */
@@ -127,25 +109,4 @@ $gradient-bottom-right: linear-gradient(135deg, #52a00eff, #073906ff, #000000ff,
 $gradient-top-left: linear-gradient(225deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
 $gradient-bottom-left: linear-gradient(315deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
 $gradient-radial: radial-gradient(#52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-
-/* Helper class for display headings. Use with a unique suffix if you need per-instance weights. */
-.wix-madefor-display {
-  font-family: var(--font-wix-display);
-  font-optical-sizing: auto;
-  font-style: normal;
-}
-
-/* Weight utilities for Wix Madefor Display / Text. Tailor weights as needed. */
-.wix-weight-400 { font-weight: 400; }
-.wix-weight-500 { font-weight: 500; }
-.wix-weight-600 { font-weight: 600; }
-.wix-weight-700 { font-weight: 700; }
-.wix-weight-800 { font-weight: 800; }
-
-/* Example variant mimicking the user's pattern: .wix-madefor-display-<uniquifier> */
-.wix-madefor-display-1 {
-  font-family: var(--font-wix-display);
-  font-optical-sizing: auto;
-  font-weight: 700; /* change to desired weight */
-  font-style: normal;
-}
+*/

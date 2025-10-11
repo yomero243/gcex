@@ -3,7 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { 
   useGLTF,
-  PerspectiveCamera
+  PerspectiveCamera,
+  useHelper
 } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from "gsap";
@@ -33,64 +34,100 @@ const EnvironmentModel: React.FC = () => {
 
 useGLTF.preload('/Environment2.glb');
 
-// Constantes para la animación de las luces
+// Configuración para la animación de las luces principales que iluminan el modelo 3D
+// Estas luces crean un efecto cinematográfico con movimiento dinámico
 const lightAnimationConfig = {
+  // Luz principal (Key Light) - La luz más importante que define la forma del objeto
   keyLight: {
-    baseX: 3, y: 4, baseZ: 5,
-    oscillationSpeed: 0.3,
-    xAmplitude: 1,
-    zAmplitude: 0.5,
-    intensityBase: 1.2,
-    intensitySpeed: 1.5,
-    intensityAmplitude: 0.2,
+    baseX: 3, y: 4, baseZ: 5,           // Posición base de la luz
+    oscillationSpeed: 0.3,              // Velocidad de oscilación en el eje X
+    xAmplitude: 1,                      // Amplitud de movimiento en X
+    zAmplitude: 0.5,                    // Amplitud de movimiento en Z
+    intensityBase: 1.2,                 // Intensidad base de la luz
+    intensitySpeed: 1.5,                // Velocidad de cambio de intensidad
+    intensityAmplitude: 0.2,            // Amplitud de variación de intensidad
   },
+  // Luz de relleno (Fill Light) - Suaviza las sombras duras de la luz principal
   fillLight: {
-    intensityBase: 0.4, intensitySpeed: 0.8, intensityAmplitude: 0.1,
+    intensityBase: 0.4,                 // Intensidad base (más suave que la key light)
+    intensitySpeed: 0.8,                // Velocidad de cambio de intensidad
+    intensityAmplitude: 0.1,            // Variación sutil de intensidad
   },
+  // Luz de contorno (Rim Light) - Crea un halo de luz alrededor del objeto
   rimLight: {
-    baseX: -4, oscillationSpeed: 0.4, xAmplitude: 0.5, intensityBase: 0.8, intensitySpeed: 2, intensityAmplitude: 0.3,
+    baseX: -4,                          // Posición base en X (lado opuesto)
+    oscillationSpeed: 0.4,              // Velocidad de movimiento horizontal
+    xAmplitude: 0.5,                    // Amplitud de movimiento en X
+    intensityBase: 0.8,                 // Intensidad base
+    intensitySpeed: 2,                  // Velocidad de cambio de intensidad
+    intensityAmplitude: 0.3,            // Variación de intensidad
   },
+  // Luz de acento (Spot Light) - Luz direccional desde arriba
   spotLight: {
-    baseY: 6, ySpeed: 0.5, yAmplitude: 0.5, intensityBase: 0.6, intensitySpeed: 1.2, intensityAmplitude: 0.2,
+    baseY: 6,                           // Altura base
+    ySpeed: 0.5,                        // Velocidad de movimiento vertical
+    yAmplitude: 0.5,                    // Amplitud de movimiento en Y
+    intensityBase: 0.6,                 // Intensidad base
+    intensitySpeed: 1.2,                // Velocidad de cambio de intensidad
+    intensityAmplitude: 0.2,            // Variación de intensidad
   }
 };
 
-// Componente para las luces que resaltan tu figura
+// Componente principal que maneja todas las luces de la escena
+// Incluye luces animadas para el modelo 3D y luces estáticas para el pasillo
 const LightsComponent: React.FC = () => {
-  const keyLightRef = useRef<THREE.DirectionalLight>(null);
-  const fillLightRef = useRef<THREE.DirectionalLight>(null);
-  const rimLightRef = useRef<THREE.DirectionalLight>(null);
-  const spotLightRef = useRef<THREE.SpotLight>(null);
+  // Referencias para las luces animadas del modelo 3D (sistema de iluminación cinematográfica)
+  const keyLightRef = useRef<THREE.DirectionalLight>(null);    // Luz principal
+  const fillLightRef = useRef<THREE.DirectionalLight>(null);   // Luz de relleno
+  const rimLightRef = useRef<THREE.DirectionalLight>(null);    // Luz de contorno
+  const spotLightRef = useRef<THREE.SpotLight>(null);          // Luz de acento
 
-  // Helpers para debugging (comentados para evitar errores de tipo)
-  // useHelper(keyLightRef, THREE.DirectionalLightHelper, 1)
-  // useHelper(spotLightRef, THREE.SpotLightHelper)
+  // Referencias para los spotlights del pasillo (uno por cada sección de navegación)
+  const hallwaySpotlight1 = useRef<THREE.SpotLight>(null!);    // Sección: Inicio
+  const hallwaySpotlight2 = useRef<THREE.SpotLight>(null!);    // Sección: Sobre mí
+  const hallwaySpotlight3 = useRef<THREE.SpotLight>(null!);    // Sección: Proyectos
+  const hallwaySpotlight4 = useRef<THREE.SpotLight>(null!);    // Sección: Habilidades
+  const hallwaySpotlight5 = useRef<THREE.SpotLight>(null!);    // Sección: Contacto
+
+  // Helpers visuales para debugging - muestran el cono de luz de cada spotlight
+  // Útiles para ajustar posiciones y ángulos durante el desarrollo
+  useHelper(hallwaySpotlight1, THREE.SpotLightHelper, 'white');
+  useHelper(hallwaySpotlight2, THREE.SpotLightHelper, 'white');
+  useHelper(hallwaySpotlight3, THREE.SpotLightHelper, 'white');
+  useHelper(hallwaySpotlight4, THREE.SpotLightHelper, 'white');
+  useHelper(hallwaySpotlight5, THREE.SpotLightHelper, 'white');
 
 
+  // Hook que se ejecuta en cada frame para animar las luces del modelo 3D
+  // Crea un efecto cinematográfico con luces que se mueven y cambian de intensidad
   useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+    const time = state.clock.getElapsedTime(); // Tiempo transcurrido desde el inicio
     const { keyLight, fillLight, rimLight, spotLight } = lightAnimationConfig;
     
-    // Luz principal que sigue tu figura
+    // Animación de la luz principal (Key Light)
+    // Se mueve en un patrón circular y varía su intensidad para crear dinamismo
     if (keyLightRef.current) {
       keyLightRef.current.position.x = keyLight.baseX + Math.sin(time * keyLight.oscillationSpeed) * keyLight.xAmplitude;
-      keyLightRef.current.position.y = keyLight.y;
+      keyLightRef.current.position.y = keyLight.y; // Altura fija
       keyLightRef.current.position.z = keyLight.baseZ + Math.cos(time * keyLight.oscillationSpeed) * keyLight.zAmplitude;
       keyLightRef.current.intensity = keyLight.intensityBase + Math.sin(time * keyLight.intensitySpeed) * keyLight.intensityAmplitude;
     }
     
-    // Luz de relleno suave
+    // Animación de la luz de relleno (Fill Light)
+    // Solo varía la intensidad para suavizar las sombras de manera sutil
     if (fillLightRef.current) {
       fillLightRef.current.intensity = fillLight.intensityBase + Math.sin(time * fillLight.intensitySpeed) * fillLight.intensityAmplitude;
     }
 
-    // Luz de contorno para crear silueta dramática
+    // Animación de la luz de contorno (Rim Light)
+    // Se mueve horizontalmente y cambia intensidad para crear siluetas dramáticas
     if (rimLightRef.current) {
       rimLightRef.current.position.x = rimLight.baseX + Math.cos(time * rimLight.oscillationSpeed) * rimLight.xAmplitude;
       rimLightRef.current.intensity = rimLight.intensityBase + Math.sin(time * rimLight.intensitySpeed) * rimLight.intensityAmplitude;
     }
 
-    // Spotlight dinámico desde arriba
+    // Animación del spotlight de acento
+    // Se mueve verticalmente y varía intensidad para efectos dinámicos desde arriba
     if (spotLightRef.current) {
       spotLightRef.current.intensity = spotLight.intensityBase + Math.sin(time * spotLight.intensitySpeed) * spotLight.intensityAmplitude;
       spotLightRef.current.position.y = spotLight.baseY + Math.sin(time * spotLight.ySpeed) * spotLight.yAmplitude;
@@ -99,115 +136,149 @@ const LightsComponent: React.FC = () => {
 
   return (
     <group>
-      {/* Luz principal (Key Light) - Cian */}
+      {/* ===== SISTEMA DE ILUMINACIÓN CINEMATOGRÁFICA PARA EL MODELO 3D ===== */}
+      
+      {/* Luz principal (Key Light) - Define la forma y volumen del objeto */}
       <directionalLight 
         ref={keyLightRef}
-        position={[3, 4, 5]} 
-        intensity={1.5} 
-        color="#00ffff" // Cian
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        position={[3, 4, 5]}              // X: 3 (derecha), Y: 4 (altura media), Z: 5 (delante)
+        intensity={1.5}                   // Intensidad: 1.5 (luz principal, más fuerte)
+        color="#ffffff"                   // Color: Blanco puro
+        castShadow                        // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}       // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}      // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Luz de relleno (Fill Light) - Magenta */}
+      {/* Luz de relleno (Fill Light) - Suaviza las sombras duras */}
       <directionalLight 
         ref={fillLightRef}
-        position={[-2, 2, 3]} 
-        intensity={0.8} 
-        color="#ff00ff" // Magenta
+        position={[-2, 2, 3]}             // X: -2 (izquierda), Y: 2 (altura baja), Z: 3 (delante)
+        intensity={0.8}                   // Intensidad: 0.8 (más suave que la key light)
+        color="#ffffff"                   // Color: Blanco puro
       />
       
-      {/* Luz de contorno (Rim Light) - Amarillo neón */}
+      {/* Luz de contorno (Rim Light) - Crea halo de luz alrededor del objeto */}
       <directionalLight 
         ref={rimLightRef}
-        position={[-4, 3, -2]} 
-        intensity={1.2} 
-        color="#ffff00" // Amarillo
+        position={[-4, 3, -2]}            // X: -4 (izquierda), Y: 3 (altura media), Z: -2 (atrás)
+        intensity={1.2}                   // Intensidad: 1.2 (fuerte para crear contraste)
+        color="#ffffff"                   // Color: Blanco puro
       />
       
-      {/* Spotlight Volumétrico 1 - Morado */}
+      {/* Spotlight Volumétrico 1 - Luz direccional roja desde arriba */}
       <spotLight
         ref={spotLightRef}
-        position={[0, 8, -10]}
-        target-position={[0, 0, -10]}
-        intensity={2}
-        color="#8A2BE2" // Morado
-        angle={Math.PI / 8}
-        penumbra={0.7}
-        distance={30}
-        castShadow
+        position={[0, 8, -10]}            // X: 0 (centro), Y: 8 (muy alto), Z: -10 (atrás)
+        target-position={[0, 0, -10]}     // Propiedad: Hacia dónde apunta la luz
+        intensity={2}                     // Intensidad: 2 (muy fuerte)
+        color="#FF0000"                   // Color: Rojo puro
+        angle={Math.PI / 8}               // Propiedad: Ángulo del cono de luz (22.5 grados)
+        penumbra={0.7}                    // Propiedad: Suavizado de bordes del cono
+        distance={30}                     // Propiedad: Distancia máxima de la luz
+        castShadow                        // Propiedad: Proyecta sombras
       />
 
-      {/* Spotlight Volumétrico 2 - Azul profundo */}
+      {/* Spotlight Volumétrico 2 - Luz direccional naranja lateral */}
       <spotLight
-        position={[5, 6, -20]}
-        target-position={[0, 0, -20]}
-        intensity={2}
-        color="#0000ff" // Azul
-        angle={Math.PI / 9}
-        penumbra={0.8}
-        distance={40}
+        position={[5, 6, -20]}            // X: 5 (derecha), Y: 6 (alto), Z: -20 (muy atrás)
+        target-position={[0, 0, -20]}     // Propiedad: Hacia dónde apunta la luz
+        intensity={2}                     // Intensidad: 2 (muy fuerte)
+        color="#FFA500"                   // Color: Naranja
+        angle={Math.PI / 9}               // Propiedad: Ángulo del cono de luz (20 grados)
+        penumbra={0.8}                    // Propiedad: Suavizado de bordes del cono
+        distance={10}                     // Propiedad: Distancia máxima de la luz
       />
       
-      {/* Luz ambiental muy tenue para no tener negros absolutos */}
-      <ambientLight intensity={0.1} color="#4b0082" /> 
+      {/* ===== ILUMINACIÓN AMBIENTAL ===== */}
       
-      {/* Luz hemisférica para un toque de color en las sombras */}
+      {/* Luz ambiental - Ilumina toda la escena uniformemente */}
+      <ambientLight 
+        intensity={0.1}                   // Intensidad: 0.1 (muy tenue, solo para evitar negros absolutos)
+        color="#4d2a00"                   // Color: Marrón oscuro
+      /> 
+      
+      {/* Luz hemisférica - Crea gradiente de color en sombras */}
       <hemisphereLight 
-        args={["#ff00ff", "#00ffff", 0.3]} // De magenta a cian
+        args={["#FFA500", "#FF4500", 0.4]} // Color arriba: Naranja, Color abajo: Rojo-naranja, Intensidad: 0.4
       />
 
-      {/* Spotlights adicionales para el pasillo */}
+      {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (SPOTLIGHTS POR SECCIÓN) ===== */}
+      
+      {/* Spotlight 1: Sección INICIO */}
       <spotLight
-        position={[0, 10, 2]} // Inicio
-        target-position={[0, 0, 2]}
-        intensity={1}
-        color="#ffffff"
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={20}
-        castShadow
+        ref={hallwaySpotlight1}
+        position={[0, 10, 2]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
+        target-position={[0, 2, 2]}        // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
+        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
+        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
+        castShadow                         // Propiedad: Proyecta sombras
       />
+      
+      {/* Spotlight 2: Sección SOBRE MÍ */}
       <spotLight
-        position={[0, 10, -2]} // Sobre mí
-        target-position={[0, 0, -2]}
-        intensity={1}
-        color="#ffffff"
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={20}
-        castShadow
+        ref={hallwaySpotlight2}
+        position={[0, 10, -2]}             // X: 0 (centro), Y: 10 (alto), Z: -2 (primera estación)
+        target-position={[0, 2, -2]}       // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
+        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
+        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
+        castShadow                         // Propiedad: Proyecta sombras
       />
+      
+      {/* Spotlight 3: Sección PROYECTOS */}
       <spotLight
-        position={[0, 10, -8]} // Proyectos
-        target-position={[0, 0, -8]}
-        intensity={1}
-        color="#ffffff"
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={20}
-        castShadow
+        ref={hallwaySpotlight3}
+        position={[3, 10, -8]}             // X: 3 (derecha), Y: 10 (alto), Z: -8 (segunda estación)
+        target-position={[0, 2, -8]}       // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
+        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
+        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
+        castShadow                         // Propiedad: Proyecta sombras
       />
+      
+      {/* Spotlight 4: Sección HABILIDADES */}
       <spotLight
-        position={[0, 10, -14]} // Habilidades
-        target-position={[0, 0, -14]}
-        intensity={1}
-        color="#ffffff"
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={20}
-        castShadow
+        ref={hallwaySpotlight4}
+        position={[0, 10, -20]}            // X: 0 (centro), Y: 10 (alto), Z: -20 (tercera estación)
+        target-position={[0, 2, -20]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={60}                     // Propiedad: Intensidad muy alta para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados) - más amplio
+        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%) - más suave
+        distance={40}                      // Propiedad: Alcance máximo de 40 unidades - más lejos
+        castShadow                         // Propiedad: Proyecta sombras
       />
+      
+      {/* Spotlight 5: Sección CONTACTO */}
       <spotLight
-        position={[0, 10, -20]} // Contacto
-        target-position={[0, 0, -20]}
-        intensity={1}
-        color="#ffffff"
-        angle={Math.PI / 6}
-        penumbra={0.5}
-        distance={20}
-        castShadow
+        ref={hallwaySpotlight5}
+        position={[0, 10, -33]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
+        target-position={[0, 2, -33]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={70}                     // Propiedad: Intensidad extrema para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados) - más amplio
+        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%) - más suave
+        distance={40}                      // Propiedad: Alcance máximo de 40 unidades - más lejos
+        castShadow                         // Propiedad: Proyecta sombras
+      />
+      
+      {/* Spotlight 6: Sección CV */}
+      <spotLight
+        position={[0, 8, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)aña
+        target-position={[0, 2, -60]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
+        intensity={1500}                  // Propiedad: Intensidad máxima para verse claramente en el suelo
+        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados)
+        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%)
+        distance={13}                      // Propiedad: Alcance reducido (13 unidades) - muy concentrado
+        castShadow                         // Propiedad: Proyecta sombras
       />
     </group>
   );
@@ -216,50 +287,57 @@ const LightsComponent: React.FC = () => {
 const Lights = React.memo(LightsComponent);
 Lights.displayName = 'Lights';
 
-// Posiciones de la cámara en un pasillo lineal
+// ===== CONFIGURACIÓN DE POSICIONES DE LA CÁMARA =====
+// Define dónde se posiciona la cámara para cada sección del pasillo
+// Todas las posiciones están a altura de persona (y: 1.5) y centradas (x: 0)
 const cameraPositions: CameraPositions = {
-  inicio:      { x: 0,  y: 1.5, z: 2 },    // Entrada del pasillo
-  "sobre-mi":  { x: 0,  y: 1.5, z: -2 },   // Primera estación
-  proyectos:   { x: 0,  y: 1.5, z: -8 },   // Segunda estación
-  habilidades: { x: 0,  y: 1.5, z: -14 },  // Tercera estación
-  contacto:    { x: 0,  y: 1.5, z: -20 },  // Cuarta estación
-  cv:          { x: 0,  y: 1.5, z: -50 }   // Final del pasillo (más profundo)
+  inicio:      { x: 0,  y: 1.5, z: 2 },    // X: 0 (centro), Y: 1.5 (altura persona), Z: 2 (entrada del pasillo)
+  "sobre-mi":  { x: 0,  y: 1.5, z: -2 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -2 (primera estación)
+  proyectos:   { x: 0,  y: 1.5, z: -8 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -8 (segunda estación)
+  habilidades: { x: 0,  y: 1.5, z: -20 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -20 (tercera estación)
+  contacto:    { x: 0,  y: 1.5, z: -50 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (cuarta estación)
+  cv:          { x: 0,  y: 1.5, z: -50 }   // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (final del pasillo)
 };
 
-// Componente que escucha los eventos de navegación y mueve la cámara
+// ===== CONTROLADOR DE CÁMARA =====
+// Componente que escucha eventos de navegación y mueve la cámara entre secciones
 const CameraControllerComponent: React.FC = () => {
-  const { camera } = useThree();
+  const { camera } = useThree(); // Hook para acceder a la cámara de Three.js
 
   useEffect(() => {
+    // Función que maneja los eventos de navegación de la cámara
     const handleCameraNavigation = (event: Event) => {
       const customEvent = event as CameraNavigationEvent;
-      const { section } = customEvent.detail;
-      const position = cameraPositions[section];
+      const { section } = customEvent.detail; // Obtiene el nombre de la sección
+      const position = cameraPositions[section]; // Busca la posición correspondiente
       
-      if (!position) return;
+      if (!position) return; // Si no existe la sección, no hace nada
 
-      // Animación suave para navegación en pasillo
+      // Animación suave de la cámara usando GSAP
       gsap.to(camera.position, {
-        x: position.x,
-        y: position.y,
-        z: position.z,
-        duration: 1.2,
-        ease: "power2.inOut",
+        x: position.x,                    // Propiedad: Posición X final
+        y: position.y,                    // Propiedad: Posición Y final  
+        z: position.z,                    // Propiedad: Posición Z final
+        duration: 1.2,                    // Propiedad: Duración de la animación (1.2 segundos)
+        ease: "power2.inOut",             // Propiedad: Curva de suavizado (aceleración y desaceleración)
         onUpdate: () => {
-          // La cámara mira hacia adelante en el pasillo
+          // Función que se ejecuta en cada frame de la animación
+          // Hace que la cámara siempre mire hacia adelante en el pasillo
           camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 5);
         }
       });
     };
 
+    // Registra el listener para el evento personalizado 'camera-navigation'
     window.addEventListener('camera-navigation', handleCameraNavigation);
     
+    // Función de limpieza que se ejecuta cuando el componente se desmonta
     return () => {
       window.removeEventListener('camera-navigation', handleCameraNavigation);
     };
-  }, [camera]);
+  }, [camera]); // Dependencia: se ejecuta cuando cambia la cámara
 
-  return null;
+  return null; // Este componente no renderiza nada visual
 };
 
 const CameraController = React.memo(CameraControllerComponent);
@@ -274,7 +352,7 @@ const Scene: React.FC = () => {
       <EnvironmentModel />
       <CameraController />
       {/* Efectos de post-procesamiento */}
-      <fog attach="fog" args={['#a7c7e7', 25, 80]} />
+
     </>
   );
 };
