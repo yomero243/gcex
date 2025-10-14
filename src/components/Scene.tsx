@@ -3,8 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { 
   useGLTF,
-  PerspectiveCamera,
-  useHelper
+  PerspectiveCamera
 } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from "gsap";
@@ -89,13 +88,7 @@ const LightsComponent: React.FC = () => {
   const hallwaySpotlight4 = useRef<THREE.SpotLight>(null!);    // Sección: Habilidades
   const hallwaySpotlight5 = useRef<THREE.SpotLight>(null!);    // Sección: Contacto
 
-  // Helpers visuales para debugging - muestran el cono de luz de cada spotlight
-  // Útiles para ajustar posiciones y ángulos durante el desarrollo
-  useHelper(hallwaySpotlight1, THREE.SpotLightHelper, 'white');
-  useHelper(hallwaySpotlight2, THREE.SpotLightHelper, 'white');
-  useHelper(hallwaySpotlight3, THREE.SpotLightHelper, 'white');
-  useHelper(hallwaySpotlight4, THREE.SpotLightHelper, 'white');
-  useHelper(hallwaySpotlight5, THREE.SpotLightHelper, 'white');
+  // Helpers visuales removidos para una vista más limpia
 
 
   // Hook que se ejecuta en cada frame para animar las luces del modelo 3D
@@ -142,7 +135,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={keyLightRef}
         position={[3, 4, 5]}              // X: 3 (derecha), Y: 4 (altura media), Z: 5 (delante)
-        intensity={1.5}                   // Intensidad: 1.5 (luz principal, más fuerte)
+        intensity={2.5}                   // Intensidad: 2.5 (luz principal, más fuerte)
         color="#ffffff"                   // Color: Blanco puro
         castShadow                        // Propiedad: Proyecta sombras
         shadow-mapSize-width={2048}       // Propiedad: Resolución de sombras (ancho)
@@ -153,7 +146,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={fillLightRef}
         position={[-2, 2, 3]}             // X: -2 (izquierda), Y: 2 (altura baja), Z: 3 (delante)
-        intensity={0.8}                   // Intensidad: 0.8 (más suave que la key light)
+        intensity={1.5}                   // Intensidad: 1.5 (más suave que la key light)
         color="#ffffff"                   // Color: Blanco puro
       />
       
@@ -161,7 +154,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={rimLightRef}
         position={[-4, 3, -2]}            // X: -4 (izquierda), Y: 3 (altura media), Z: -2 (atrás)
-        intensity={1.2}                   // Intensidad: 1.2 (fuerte para crear contraste)
+        intensity={2.0}                   // Intensidad: 2.0 (fuerte para crear contraste)
         color="#ffffff"                   // Color: Blanco puro
       />
       
@@ -199,7 +192,7 @@ const LightsComponent: React.FC = () => {
       
       {/* Luz hemisférica - Crea gradiente de color en sombras */}
       <hemisphereLight 
-        args={["#FFA500", "#FF4500", 0.4]} // Color arriba: Naranja, Color abajo: Rojo-naranja, Intensidad: 0.4
+        args={["#ffffff", "#ffffff", 0.6]} // Color arriba: Blanco, Color abajo: Blanco, Intensidad: 0.6
       />
 
       {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (SPOTLIGHTS POR SECCIÓN) ===== */}

@@ -33,33 +33,21 @@
   --tw-ease: var(--ease-in-out);
   --tw-backdrop-blur: blur(8px);
 
-  /* Legacy variables (kept for compatibility) */
-  --color-primary: #9bc70bff; /* yellow-green */
-  --color-secondary: #52a00eff; /* kelly-green */
-  --color-dark: #073906ff; /* pakistan-green */
-  --color-black: #000000ff;
-  --color-black-2: #010000ff;
-
-  /* New named palette (HEX) */
-  --kelly-green-hex: #52a00eff;
-  --pakistan-green-hex: #073906ff;
-  --black-hex: #000000ff;
-  --black-2-hex: #010000ff;
-  --yellow-green-hex: #9bc70bff;
+  /* --- Color Palette --- */
+  /* Use these aliases throughout the application */
+  --yellow-green: #9bc70b;
+  --kelly-green: #52a00e;
+  --pakistan-green: #073906;
+  --black: #000000;
+  --black-2: #010000;
 
   /* New named palette (HSL) */
+  /* HSL versions are available if needed for color manipulation */
   --kelly-green-hsl: hsla(92, 84%, 34%, 1);
   --pakistan-green-hsl: hsla(119, 81%, 12%, 1);
   --black-hsl: hsla(0, 0%, 0%, 1);
   --black-2-hsl: hsla(0, 100%, 0%, 1);
   --yellow-green-hsl: hsla(74, 90%, 41%, 1);
-
-  /* Color aliases for easy use */
-  --kelly-green: var(--kelly-green-hex);
-  --pakistan-green: var(--pakistan-green-hex);
-  --yellow-green: var(--yellow-green-hex);
-  --black: var(--black-hex);
-  --black-2: var(--black-2-hex);
 
   /* Gradient variables (linear + radial) */
   --gradient-top: linear-gradient(0deg, var(--kelly-green), var(--pakistan-green), var(--black), var(--black-2), var(--yellow-green));
@@ -82,31 +70,31 @@
 
 /* SCSS equivalents (commented) - copy into your .scss files if needed */
 /*
-$kelly-green: #52a00eff;
-$pakistan-green: #073906ff;
-$black: #000000ff;
-$black-2: #010000ff;
-$yellow-green: #9bc70bff;
+$kelly-green: #52a00e;
+$pakistan-green: #073906;
+$black: #000000;
+$black-2: #010000;
+$yellow-green: #9bc70b;
 
 $kelly-green-hsl: hsla(92, 84%, 34%, 1);
 $pakistan-green-hsl: hsla(119, 81%, 12%, 1);
 $black-hsl: hsla(0, 0%, 0%, 1);
 $black-2-hsl: hsla(0, 100%, 0%, 1);
 $yellow-green-hsl: hsla(74, 90%, 41%, 1);
-
+ 
 $kelly-green-rgb: rgba(82, 160, 14, 1);
 $pakistan-green-rgb: rgba(7, 57, 6, 1);
 $black-rgb: rgba(0, 0, 0, 1);
 $black-2-rgb: rgba(1, 0, 0, 1);
 $yellow-green-rgb: rgba(155, 199, 11, 1);
 
-$gradient-top: linear-gradient(0deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-right: linear-gradient(90deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-bottom: linear-gradient(180deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-left: linear-gradient(270deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-top-right: linear-gradient(45deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-bottom-right: linear-gradient(135deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-top-left: linear-gradient(225deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-bottom-left: linear-gradient(315deg, #52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
-$gradient-radial: radial-gradient(#52a00eff, #073906ff, #000000ff, #010000ff, #9bc70bff);
+$gradient-top: linear-gradient(0deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-right: linear-gradient(90deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-bottom: linear-gradient(180deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-left: linear-gradient(270deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-top-right: linear-gradient(45deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-bottom-right: linear-gradient(135deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-top-left: linear-gradient(225deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-bottom-left: linear-gradient(315deg, #52a00e, #073906, #000000, #010000, #9bc70b);
+$gradient-radial: radial-gradient(#52a00e, #073906, #000000, #010000, #9bc70b);
 */
