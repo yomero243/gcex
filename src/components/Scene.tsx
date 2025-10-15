@@ -81,12 +81,12 @@ const LightsComponent: React.FC = () => {
   const rimLightRef = useRef<THREE.DirectionalLight>(null);    // Luz de contorno
   const spotLightRef = useRef<THREE.SpotLight>(null);          // Luz de acento
 
-  // Referencias para los spotlights del pasillo (uno por cada sección de navegación)
-  const hallwaySpotlight1 = useRef<THREE.SpotLight>(null!);    // Sección: Inicio
-  const hallwaySpotlight2 = useRef<THREE.SpotLight>(null!);    // Sección: Sobre mí
-  const hallwaySpotlight3 = useRef<THREE.SpotLight>(null!);    // Sección: Proyectos
-  const hallwaySpotlight4 = useRef<THREE.SpotLight>(null!);    // Sección: Habilidades
-  const hallwaySpotlight5 = useRef<THREE.SpotLight>(null!);    // Sección: Contacto
+  // Referencias para las luces direccionales del pasillo (uno por cada sección de navegación)
+  const hallwaySpotlight1 = useRef<THREE.DirectionalLight>(null!);    // Sección: Inicio
+  const hallwaySpotlight2 = useRef<THREE.DirectionalLight>(null!);    // Sección: Sobre mí
+  const hallwaySpotlight3 = useRef<THREE.DirectionalLight>(null!);    // Sección: Proyectos
+  const hallwaySpotlight4 = useRef<THREE.DirectionalLight>(null!);    // Sección: Habilidades
+  const hallwaySpotlight5 = useRef<THREE.DirectionalLight>(null!);    // Sección: Contacto
 
   // Helpers visuales removidos para una vista más limpia
 
@@ -158,36 +158,15 @@ const LightsComponent: React.FC = () => {
         color="#ffffff"                   // Color: Blanco puro
       />
       
-      {/* Spotlight Volumétrico 1 - Luz direccional roja desde arriba */}
-      <spotLight
-        ref={spotLightRef}
-        position={[0, 8, -10]}            // X: 0 (centro), Y: 8 (muy alto), Z: -10 (atrás)
-        target-position={[0, 0, -10]}     // Propiedad: Hacia dónde apunta la luz
-        intensity={2}                     // Intensidad: 2 (muy fuerte)
-        color="#FF0000"                   // Color: Rojo puro
-        angle={Math.PI / 8}               // Propiedad: Ángulo del cono de luz (22.5 grados)
-        penumbra={0.7}                    // Propiedad: Suavizado de bordes del cono
-        distance={30}                     // Propiedad: Distancia máxima de la luz
-        castShadow                        // Propiedad: Proyecta sombras
-      />
+     
 
-      {/* Spotlight Volumétrico 2 - Luz direccional naranja lateral */}
-      <spotLight
-        position={[5, 6, -20]}            // X: 5 (derecha), Y: 6 (alto), Z: -20 (muy atrás)
-        target-position={[0, 0, -20]}     // Propiedad: Hacia dónde apunta la luz
-        intensity={2}                     // Intensidad: 2 (muy fuerte)
-        color="#FFA500"                   // Color: Naranja
-        angle={Math.PI / 9}               // Propiedad: Ángulo del cono de luz (20 grados)
-        penumbra={0.8}                    // Propiedad: Suavizado de bordes del cono
-        distance={10}                     // Propiedad: Distancia máxima de la luz
-      />
-      
+ 
       {/* ===== ILUMINACIÓN AMBIENTAL ===== */}
       
       {/* Luz ambiental - Ilumina toda la escena uniformemente */}
-      <ambientLight 
-        intensity={0.1}                   // Intensidad: 0.1 (muy tenue, solo para evitar negros absolutos)
-        color="#4d2a00"                   // Color: Marrón oscuro
+      <directionalLight 
+        intensity={2}                   // Intensidad: 0.1 (muy tenue, solo para evitar negros absolutos)
+        color="#FFFFFF"                   // Color: Marrón oscuro
       /> 
       
       {/* Luz hemisférica - Crea gradiente de color en sombras */}
@@ -195,83 +174,71 @@ const LightsComponent: React.FC = () => {
         args={["#ffffff", "#ffffff", 0.6]} // Color arriba: Blanco, Color abajo: Blanco, Intensidad: 0.6
       />
 
-      {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (SPOTLIGHTS POR SECCIÓN) ===== */}
+      {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (LUCES DIRECCIONALES POR SECCIÓN) ===== */}
       
-      {/* Spotlight 1: Sección INICIO */}
-      <spotLight
+      {/* Direccional 1: Sección INICIO */}
+      <directionalLight
         ref={hallwaySpotlight1}
         position={[0, 10, 2]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
-        target-position={[0, 2, 2]}        // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
-        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
-        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Spotlight 2: Sección SOBRE MÍ */}
-      <spotLight
+      {/* Direccional 2: Sección SOBRE MÍ */}
+      <directionalLight
         ref={hallwaySpotlight2}
         position={[0, 10, -2]}             // X: 0 (centro), Y: 10 (alto), Z: -2 (primera estación)
-        target-position={[0, 2, -2]}       // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
-        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
-        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Spotlight 3: Sección PROYECTOS */}
-      <spotLight
+      {/* Direccional 3: Sección PROYECTOS */}
+      <directionalLight
         ref={hallwaySpotlight3}
         position={[3, 10, -8]}             // X: 3 (derecha), Y: 10 (alto), Z: -8 (segunda estación)
-        target-position={[0, 2, -8]}       // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={50}                     // Propiedad: Intensidad alta para verse claramente en el suelo
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 20}               // Propiedad: Ángulo del cono (9 grados) - muy enfocado
-        penumbra={0.8}                     // Propiedad: Suavizado de bordes (80%)
-        distance={35}                      // Propiedad: Alcance máximo de 35 unidades
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Spotlight 4: Sección HABILIDADES */}
-      <spotLight
+      {/* Direccional 4: Sección HABILIDADES */}
+      <directionalLight
         ref={hallwaySpotlight4}
         position={[0, 10, -20]}            // X: 0 (centro), Y: 10 (alto), Z: -20 (tercera estación)
-        target-position={[0, 2, -20]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={60}                     // Propiedad: Intensidad muy alta para verse claramente en el suelo
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados) - más amplio
-        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%) - más suave
-        distance={40}                      // Propiedad: Alcance máximo de 40 unidades - más lejos
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Spotlight 5: Sección CONTACTO */}
-      <spotLight
+      {/* Direccional 5: Sección CONTACTO */}
+      <directionalLight
         ref={hallwaySpotlight5}
         position={[0, 10, -33]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
-        target-position={[0, 2, -33]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={70}                     // Propiedad: Intensidad extrema para verse claramente en el suelo
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados) - más amplio
-        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%) - más suave
-        distance={40}                      // Propiedad: Alcance máximo de 40 unidades - más lejos
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
-      {/* Spotlight 6: Sección CV */}
-      <spotLight
-        position={[0, 8, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)aña
-        target-position={[0, 2, -60]}      // Propiedad: Apunta hacia Y: 2 (no pasa por debajo de la malla)
-        intensity={1500}                  // Propiedad: Intensidad máxima para verse claramente en el suelo
+      {/* Direccional 6: Sección CV */}
+      <directionalLight
+        position={[0, 8, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)
+        intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        angle={Math.PI / 18}               // Propiedad: Ángulo del cono (10 grados)
-        penumbra={0.9}                     // Propiedad: Suavizado de bordes (90%)
-        distance={13}                      // Propiedad: Alcance reducido (13 unidades) - muy concentrado
         castShadow                         // Propiedad: Proyecta sombras
+        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
     </group>
   );
