@@ -1,47 +1,19 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import GUI from 'lil-gui';
-import { Box, Environment } from '@react-three/drei';
 import Scene from './Scene';
 import Particles from './Particles';
 import * as THREE from 'three';
 
-interface ExperienceProps {
-  scrollProgress: number;
-}
-
-const Experience: React.FC<ExperienceProps> = ({ scrollProgress }) => {
+const Experience: React.FC = () => {
   const { scene } = useThree();
 
   const fogParams = useMemo(() => ({
-    color1: '#629362',
-    color2: '#b29238',
+    color1: '#c5edc5',
+    color2: '#b89575',
   }), []);
 
-  const color1 = useMemo(() => new THREE.Color(), []);
-  const color2 = useMemo(() => new THREE.Color(), []);
-
-  useEffect(() => {
-    if (scene.fog) {
-      color1.set(fogParams.color1);
-      color2.set(fogParams.color2);
-
-      const gui = new GUI();
-      const fogFolder = gui.addFolder('Fog');
-      fogFolder.add(scene.fog, 'near', 0, 100).name('Near');
-      fogFolder.add(scene.fog, 'far', 0, 200).name('Far');
-      fogFolder.addColor(fogParams, 'color1').name('Color 1').onChange((value: string) => {
-        color1.set(value);
-      });
-      fogFolder.addColor(fogParams, 'color2').name('Color 2').onChange((value: string) => {
-        color2.set(value);
-      });
-      
-      return () => {
-        gui.destroy();
-      };
-    }
-  }, [scene, fogParams, color1, color2]);
+  const color1 = useMemo(() => new THREE.Color(fogParams.color1), [fogParams.color1]);
+  const color2 = useMemo(() => new THREE.Color(fogParams.color2), [fogParams.color2]);
 
   useFrame(({ clock }) => {
     if (scene.fog) {

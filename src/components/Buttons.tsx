@@ -8,10 +8,10 @@ interface ButtonsProps {
 
 const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) => {
   const getButtonClasses = (section: string): string => {
-    return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium ${
+    return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
       activeSection === section
-  ? "bg-white/30 text-pakistan-green"
-  : "text-gray-600 hover:bg-white/30 hover:text-pakistan-green"
+        ? "bg-white/25 border border-white/40 text-white" // Active state with more emphasis
+        : "text-white/70 hover:bg-white/10 hover:text-white border border-transparent"
     }`;
   };
 
@@ -35,9 +35,10 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
         pointerEvents: 'auto',
       }}
     >
-      <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white/30 backdrop-blur-[8px] w-64">
+      {/* Applying liquid glass style here */}
+      <div className="flex h-screen flex-col justify-between border-l border-white/25 bg-white/5 backdrop-blur-[25px] w-64 shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
         <div className="px-4 py-6">
-          <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100/30 text-xs text-pakistan-green">
+          <span className="grid h-10 w-32 place-content-center rounded-lg bg-white/10 text-xs text-white">
             GCEX
           </span>
 
@@ -55,8 +56,8 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
           </ul>
         </div>
 
-        <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-          <a href="#" className="flex items-center gap-2 bg-white/30 p-4 hover:bg-white/40">
+        <div className="sticky inset-x-0 bottom-0 border-t border-white/25">
+          <a href="#" className="flex items-center gap-2 p-4 hover:bg-white/10">
             <img
               alt="Jose Gabriel Cerdio Oyarzabal"
               src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
@@ -64,9 +65,9 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
             />
 
             <div>
-              <p className="text-xs">
+              <p className="text-xs text-white">
                 <strong className="block font-medium">Jose Gabriel Cerdio Oyarzabal</strong>
-                <span>j.g.cerdio@email.com</span>
+                <span className="text-white/70">j.g.cerdio@email.com</span>
               </p>
             </div>
           </a>

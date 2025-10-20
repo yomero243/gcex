@@ -27,11 +27,11 @@ interface CameraPositions {
 
 // Componente para el Cubo
 const EnvironmentModel: React.FC = () => {
-  const { scene } = useGLTF('/Environment2.glb');
+  const { scene } = useGLTF('/Environment7.glb');
   return <primitive object={scene} />;
 };
 
-useGLTF.preload('/Environment2.glb');
+useGLTF.preload('/Environment7.glb');
 
 // Configuración para la animación de las luces principales que iluminan el modelo 3D
 // Estas luces crean un efecto cinematográfico con movimiento dinámico
@@ -61,15 +61,6 @@ const lightAnimationConfig = {
     intensitySpeed: 2,                  // Velocidad de cambio de intensidad
     intensityAmplitude: 0.3,            // Variación de intensidad
   },
-  // Luz de acento (Spot Light) - Luz direccional desde arriba
-  spotLight: {
-    baseY: 6,                           // Altura base
-    ySpeed: 0.5,                        // Velocidad de movimiento vertical
-    yAmplitude: 0.5,                    // Amplitud de movimiento en Y
-    intensityBase: 0.6,                 // Intensidad base
-    intensitySpeed: 1.2,                // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.2,            // Variación de intensidad
-  }
 };
 
 // Componente principal que maneja todas las luces de la escena
@@ -79,7 +70,6 @@ const LightsComponent: React.FC = () => {
   const keyLightRef = useRef<THREE.DirectionalLight>(null);    // Luz principal
   const fillLightRef = useRef<THREE.DirectionalLight>(null);   // Luz de relleno
   const rimLightRef = useRef<THREE.DirectionalLight>(null);    // Luz de contorno
-  const spotLightRef = useRef<THREE.SpotLight>(null);          // Luz de acento
 
   // Referencias para las luces direccionales del pasillo (uno por cada sección de navegación)
   const hallwaySpotlight1 = useRef<THREE.DirectionalLight>(null!);    // Sección: Inicio
@@ -95,7 +85,7 @@ const LightsComponent: React.FC = () => {
   // Crea un efecto cinematográfico con luces que se mueven y cambian de intensidad
   useFrame((state) => {
     const time = state.clock.getElapsedTime(); // Tiempo transcurrido desde el inicio
-    const { keyLight, fillLight, rimLight, spotLight } = lightAnimationConfig;
+    const { keyLight, fillLight, rimLight } = lightAnimationConfig;
     
     // Animación de la luz principal (Key Light)
     // Se mueve en un patrón circular y varía su intensidad para crear dinamismo
@@ -118,13 +108,6 @@ const LightsComponent: React.FC = () => {
       rimLightRef.current.position.x = rimLight.baseX + Math.cos(time * rimLight.oscillationSpeed) * rimLight.xAmplitude;
       rimLightRef.current.intensity = rimLight.intensityBase + Math.sin(time * rimLight.intensitySpeed) * rimLight.intensityAmplitude;
     }
-
-    // Animación del spotlight de acento
-    // Se mueve verticalmente y varía intensidad para efectos dinámicos desde arriba
-    if (spotLightRef.current) {
-      spotLightRef.current.intensity = spotLight.intensityBase + Math.sin(time * spotLight.intensitySpeed) * spotLight.intensityAmplitude;
-      spotLightRef.current.position.y = spotLight.baseY + Math.sin(time * spotLight.ySpeed) * spotLight.yAmplitude;
-    }
   });
 
   return (
@@ -138,8 +121,8 @@ const LightsComponent: React.FC = () => {
         intensity={2.5}                   // Intensidad: 2.5 (luz principal, más fuerte)
         color="#ffffff"                   // Color: Blanco puro
         castShadow                        // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}       // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}      // Propiedad: Resolución de sombras (alto)
+        shadow-mapSize-width={1024}       // Propiedad: Resolución de sombras (ancho)
+        shadow-mapSize-height={1024}      // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Luz de relleno (Fill Light) - Suaviza las sombras duras */}
@@ -166,7 +149,7 @@ const LightsComponent: React.FC = () => {
       {/* Luz ambiental - Ilumina toda la escena uniformemente */}
       <directionalLight 
         intensity={2}                   // Intensidad: 0.1 (muy tenue, solo para evitar negros absolutos)
-        color="#FFFFFF"                   // Color: Marrón oscuro
+        color="#4B4B4B"                   // Color: Marrón oscuro
       /> 
       
       {/* Luz hemisférica - Crea gradiente de color en sombras */}
@@ -182,9 +165,6 @@ const LightsComponent: React.FC = () => {
         position={[0, 10, 2]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Direccional 2: Sección SOBRE MÍ */}
@@ -193,9 +173,6 @@ const LightsComponent: React.FC = () => {
         position={[0, 10, -2]}             // X: 0 (centro), Y: 10 (alto), Z: -2 (primera estación)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Direccional 3: Sección PROYECTOS */}
@@ -204,9 +181,6 @@ const LightsComponent: React.FC = () => {
         position={[3, 10, -8]}             // X: 3 (derecha), Y: 10 (alto), Z: -8 (segunda estación)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Direccional 4: Sección HABILIDADES */}
@@ -215,9 +189,6 @@ const LightsComponent: React.FC = () => {
         position={[0, 10, -20]}            // X: 0 (centro), Y: 10 (alto), Z: -20 (tercera estación)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Direccional 5: Sección CONTACTO */}
@@ -226,9 +197,6 @@ const LightsComponent: React.FC = () => {
         position={[0, 10, -33]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
       
       {/* Direccional 6: Sección CV */}
@@ -236,9 +204,6 @@ const LightsComponent: React.FC = () => {
         position={[0, 8, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)
         intensity={1}                      // Propiedad: Intensidad baja
         color="#CCCCFF"                    // Propiedad: Color lavanda místico
-        castShadow                         // Propiedad: Proyecta sombras
-        shadow-mapSize-width={2048}        // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={2048}       // Propiedad: Resolución de sombras (alto)
       />
     </group>
   );

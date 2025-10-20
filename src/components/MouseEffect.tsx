@@ -5,75 +5,64 @@ import { mouseState } from "../utils/mouseState";
 // Elementos que deberían activar efecto hover
 const INTERACTIVE_ELEMENTS = new Set(['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA']);
 
-// Variables para el manejo del movimiento del ratón
-let lastMouseX = 0;
-let lastMouseY = 0;
-let lastUpdateTime = performance.now();
-
 /**
  * Componente que crea un efecto de cursor personalizado
- * @returns {JSX.Element} Componente de efecto de cursor
+ * @returns {JSX.Element | null} Componente de efecto de cursor o null en dispositivos táctiles
  */
 const MouseEffect: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const mousePosition = useRef({ x: 0, y: 0 });
+  const targetPosition = useRef({ x: 0, y: 0 });
   const rafId = useRef<number | null>(null);
   const isHovering = useRef(false);
-  const isInitialized = useRef(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Actualiza la posición del cursor con animación
+  // Actualiza la posición del cursor con animación de interpolación
   const updateCursorPosition = useCallback(() => {
-    if (!cursorRef.current) {
-      rafId.current = requestAnimationFrame(updateCursorPosition);
-      return;
+    if (cursorRef.current) {
+      const currentX = mousePosition.current.x;
+      const currentY = mousePosition.current.y;
+      const targetX = targetPosition.current.x;
+      const targetY = targetPosition.current.y;
+
+      // Interpolación lineal (lerp) para un movimiento suave
+      const lerpedX = currentX + (targetX - currentX) * 0.2; // Aumentado para más reactividad
+      const lerpedY = currentY + (targetY - currentY) * 0.2;
+
+      // Detener la animación si está lo suficientemente cerca para ahorrar rendimiento
+      if (Math.abs(targetX - lerpedX) > 0.1 || Math.abs(targetY - lerpedY) > 0.1) {
+        mousePosition.current = { x: lerpedX, y: lerpedY };
+        cursorRef.current.style.transform = `translate3d(${lerpedX}px, ${lerpedY}px, 0)`;
+      } else {
+        mousePosition.current = { x: targetX, y: targetY };
+        cursorRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      }
     }
-    
-    cursorRef.current.style.transform = `translate3d(${mousePosition.current.x}px, ${mousePosition.current.y}px, 0)`;
-    
-    if (!isInitialized.current) {
-      cursorRef.current.style.opacity = '1';
-      isInitialized.current = true;
-    }
-    
     rafId.current = requestAnimationFrame(updateCursorPosition);
   }, []);
 
   // Establece la posición inicial del cursor
   const initializePosition = useCallback(() => {
-    mousePosition.current = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2
-    };
+    const initialX = window.innerWidth / 2;
+    const initialY = window.innerHeight / 2;
+    mousePosition.current = { x: initialX, y: initialY };
+    targetPosition.current = { x: initialX, y: initialY };
     if (cursorRef.current) {
       cursorRef.current.style.opacity = '0';
-      cursorRef.current.style.transform = `translate3d(${mousePosition.current.x}px, ${mousePosition.current.y}px, 0)`;
+      cursorRef.current.style.transform = `translate3d(${initialX}px, ${initialY}px, 0)`;
+      // Mostrar el cursor después de un breve retraso para evitar el parpadeo inicial
+      setTimeout(() => {
+        if (cursorRef.current) cursorRef.current.style.opacity = '1';
+      }, 100);
     }
   }, []);
 
-  // Maneja el movimiento del ratón con interpolación suave
+  // Actualiza la posición objetivo del ratón
   const handleMouseMove = useCallback((event: MouseEvent) => {
-    const currentTime = performance.now();
-    const timeDelta = currentTime - lastUpdateTime;
-
-    // Actualiza la posición solo si ha pasado suficiente tiempo (60 FPS aproximadamente)
-    if (timeDelta > 16) {
-      const dx = event.clientX - lastMouseX;
-      const dy = event.clientY - lastMouseY;
-      
-      // Interpolación suave del movimiento
-      mousePosition.current = {
-        x: lastMouseX + dx * 0.5,
-        y: lastMouseY + dy * 0.5
-      };
-
-      lastMouseX = event.clientX;
-      lastMouseY = event.clientY;
-      lastUpdateTime = currentTime;
-
-      mouseState.x = event.clientX;
-      mouseState.y = event.clientY;
-    }
+    targetPosition.current.x = event.clientX;
+    targetPosition.current.y = event.clientY;
+    mouseState.x = event.clientX;
+    mouseState.y = event.clientY;
   }, []);
 
   // Detecta si el elemento hover es interactivo
@@ -85,9 +74,7 @@ const MouseEffect: React.FC = () => {
 
     if (isInteractive !== isHovering.current) {
       isHovering.current = isInteractive;
-      if (cursorRef.current) {
-        cursorRef.current.classList.toggle('hover', isInteractive);
-      }
+      cursorRef.current?.classList.toggle('hover', isInteractive);
     }
   }, []);
 
@@ -104,25 +91,15 @@ const MouseEffect: React.FC = () => {
   useEffect(() => {
     detectTouchDevice();
     
-    // No mostrar cursor personalizado en dispositivos táctiles
     if (isTouchDevice) return;
-    
-    // Reiniciar valores de seguimiento
-    lastMouseX = window.innerWidth / 2;
-    lastMouseY = window.innerHeight / 2;
-    lastUpdateTime = performance.now();
     
     initializePosition();
     rafId.current = requestAnimationFrame(updateCursorPosition);
 
-    // Event listeners
     document.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseover', handleInteraction, { passive: true });
-    
-    // Ocultar cursor predeterminado
     document.documentElement.style.cursor = 'none';
 
-    // Limpieza
     return () => {
       if (rafId.current) {
         cancelAnimationFrame(rafId.current);
@@ -131,9 +108,8 @@ const MouseEffect: React.FC = () => {
       document.removeEventListener('mouseover', handleInteraction);
       document.documentElement.style.cursor = '';
     };
-  }, [updateCursorPosition, handleMouseMove, handleInteraction, initializePosition, detectTouchDevice, isTouchDevice]);
+  }, [isTouchDevice, detectTouchDevice, initializePosition, updateCursorPosition, handleMouseMove, handleInteraction]);
 
-  // No renderizar nada en dispositivos táctiles
   if (isTouchDevice) {
     return null;
   }

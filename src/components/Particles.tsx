@@ -17,12 +17,12 @@ const ParticlesInstance: React.FC = () => {
   const { viewport, camera } = useThree();
 
   const particlesData = useRef<ParticlesData>({
-    positions: new Float32Array(2000 * 3),
-    velocities: new Float32Array(2000 * 3),
-    lifetimes: new Float32Array(2000),
-    colors: new Float32Array(2000 * 3),
-    sizes: new Float32Array(2000),
-    count: 2000,
+    positions: new Float32Array(1000 * 3),
+    velocities: new Float32Array(1000 * 3),
+    lifetimes: new Float32Array(1000),
+    colors: new Float32Array(1000 * 3),
+    sizes: new Float32Array(1000),
+    count: 1000,
   });
 
   useEffect(() => {
@@ -153,7 +153,7 @@ const ParticlesInstance: React.FC = () => {
         map={textureRef.current}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        color={0x9bc70b}
+        color={0xffffff}        
       />
     </points>
   );
