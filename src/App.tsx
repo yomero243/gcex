@@ -1,13 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Experience from './components/Experience';
 import Buttons from './components/Buttons';
 import MouseEffect from './components/MouseEffect';
 import ScrollableContent from './components/ScrollableContent';
+import { LoadingScreen } from './components/LoadingScreen';
 
 function App() {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
+  const [started, setStarted] = useState(false);
 
   const handleNavigation = (section: string) => {
     setActiveSection(section);
@@ -44,10 +46,16 @@ function App() {
       </div>
 
       {/* Container for the 3D Canvas */}
-      <div className="fixed top-0 left-0 w-full h-screen">
-        <Canvas className="w-full h-full">
-          <Experience />
-        </Canvas>
+      <div className={`fixed top-0 left-0 w-full h-screen ${started ? 'z-0' : 'z-30'}`}>
+        {started ? (
+          <Suspense fallback={null}>
+            <Canvas className="w-full h-full">
+              <Experience />
+            </Canvas>
+          </Suspense>
+        ) : (
+          <LoadingScreen onStarted={() => setStarted(true)} />
+        )}
       </div>
 
       {/* The new carousel-based scrollable content */}
