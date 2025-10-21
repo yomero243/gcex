@@ -13,7 +13,7 @@
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
     contain: layout style paint;
-    z-index: 9999;
+    z-index: 40;
     mix-blend-mode: difference;
 }
 
