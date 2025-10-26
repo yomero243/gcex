@@ -17,12 +17,12 @@ const ParticlesInstance: React.FC = () => {
   const { viewport, camera } = useThree();
 
   const particlesData = useRef<ParticlesData>({
-    positions: new Float32Array(1000 * 3),
-    velocities: new Float32Array(1000 * 3),
-    lifetimes: new Float32Array(1000),
-    colors: new Float32Array(1000 * 3),
-    sizes: new Float32Array(1000),
-    count: 1000,
+    positions: new Float32Array(100 * 3),
+    velocities: new Float32Array(100 * 3),
+    lifetimes: new Float32Array(100),
+    colors: new Float32Array(100 * 3),
+    sizes: new Float32Array(100),
+    count: 100,
   });
 
   useEffect(() => {
@@ -34,17 +34,20 @@ const ParticlesInstance: React.FC = () => {
       particlesData.current.positions[i3 + 2] = (Math.random() - 0.5) * 5;
 
       particlesData.current.velocities[i3] = (Math.random() - 0.5) * 0.01;
-      particlesData.current.velocities[i3 + 1] = (Math.random() - 0.5) * 0.01;
+      particlesData.current.velocities[i3 + 1] = Math.random() * 0.02 + 0.01;
       particlesData.current.velocities[i3 + 2] = (Math.random() - 0.5) * 0.01;
 
-      // Color blanco para todas las partículas
-      particlesData.current.colors[i3] = 1; // r
-      particlesData.current.colors[i3 + 1] = 1; // g
-      particlesData.current.colors[i3 + 2] = 1; // b
+      // Color anaranjado para el fuego
+      const fireColor = new THREE.Color(0xffa500); // Naranja
+      fireColor.r += (Math.random() - 0.5) * 0.5; // Variación hacia rojo/amarillo
+      fireColor.g += (Math.random() - 0.5) * 0.2;
+      
+      particlesData.current.colors[i3] = fireColor.r;
+      particlesData.current.colors[i3 + 1] = fireColor.g;
+      particlesData.current.colors[i3 + 2] = fireColor.b;
 
       particlesData.current.sizes[i] = Math.random() * 0.3 + 0.1;
-      // Dar lifetime inicial para que las partículas sean visibles desde el inicio
-      particlesData.current.lifetimes[i] = -Math.random() * 60;
+      particlesData.current.lifetimes[i] = 0;
     }
   }, [viewport]);
 
@@ -68,64 +71,74 @@ const ParticlesInstance: React.FC = () => {
     }
   }, []);
 
-  const mouse2D = useRef(new THREE.Vector2());
+
   const lastUpdate = useRef(0);
 
-  useFrame((state) => {
+  const mouse2D = useRef(new THREE.Vector2());
+  const lastMousePos = useRef(new THREE.Vector2());
+  const cachedMousePos = useRef(new THREE.Vector3());
+  const lastMouseUpdate = useRef(0);
+
+  useFrame((state, delta) => {
     if (!particlesRef.current) return;
 
     const time = state.clock.getElapsedTime();
-    if (time - lastUpdate.current < 1 / 30) { // Throttle to 30 FPS
-      return;
+
+    // Update 3D mouse position only every 100ms
+    if (time - lastMouseUpdate.current > 0.1) {
+      mouse2D.current.set(
+        (mouseState.x / window.innerWidth) * 2 - 1,
+        -(mouseState.y / window.innerHeight) * 2 + 1
+      );
+      state.raycaster.setFromCamera(mouse2D.current, camera);
+      state.raycaster.ray.at(4, cachedMousePos.current);
+      lastMouseUpdate.current = time;
     }
-    lastUpdate.current = time;
 
-    // Convert mouse position to 2D normalized coordinates
-    mouse2D.current.set(
-      (mouseState.x / window.innerWidth) * 2 - 1,
-      -(mouseState.y / window.innerHeight) * 2 + 1
-    );
-    
-    const mousePos = new THREE.Vector3();
-    state.raycaster.setFromCamera(mouse2D.current, camera);
-    state.raycaster.ray.at(4, mousePos);
+    const { positions, velocities, lifetimes, sizes, count } = particlesData.current;
 
-    const { positions, velocities, lifetimes, count } = particlesData.current;
+    const mouseMoved = lastMousePos.current.x !== mouseState.x || lastMousePos.current.y !== mouseState.y;
+
+    if (mouseMoved) {
+      let found = 0;
+      for (let i = 0; i < count && found < 5; i++) {
+        if (lifetimes[i] <= 0) {
+          positions[i * 3] = cachedMousePos.current.x;
+          positions[i * 3 + 1] = cachedMousePos.current.y;
+          positions[i * 3 + 2] = cachedMousePos.current.z;
+
+          velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+          velocities[i * 3 + 1] = Math.random() * 0.02 + 0.01;
+          velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+
+          lifetimes[i] = Math.random() * 60 + 60;
+          found++;
+        }
+      }
+    }
+
+    lastMousePos.current.set(mouseState.x, mouseState.y);
 
     for (let i = 0; i < count; i++) {
-      const i3 = i * 3;
+      if (lifetimes[i] > 0) {
+        const i3 = i * 3;
 
-      // Si la partícula no tiene vida, regenerarla
-      if (lifetimes[i] <= 0) {
-        // 70% de probabilidad de regenerar desde la posición del mouse
-        // 30% de probabilidad de regenerar en posición aleatoria
-        if (Math.random() < 0.7 && mouseState.x !== 0 && mouseState.y !== 0) {
-          positions[i3] = mousePos.x;
-          positions[i3 + 1] = mousePos.y;
-          positions[i3 + 2] = mousePos.z;
-        } else {
-          positions[i3] = (Math.random() - 0.5) * viewport.width;
-          positions[i3 + 1] = (Math.random() - 0.5) * viewport.height;
-          positions[i3 + 2] = (Math.random() - 0.5) * 5;
-        }
+        velocities[i3] += (Math.random() - 0.5) * 0.001;
+        velocities[i3 + 2] += (Math.random() - 0.5) * 0.001;
 
-        velocities[i3] = (Math.random() - 0.5) * 0.02;
-        velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
-        velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+        positions[i3] += velocities[i3];
+        positions[i3 + 1] += velocities[i3 + 1];
+        positions[i3 + 2] += velocities[i3 + 2];
 
-        lifetimes[i] = Math.random() * 60 + 30; // Lifetime más largo
+        const lifeFactor = lifetimes[i] / 120;
+        sizes[i] = (Math.sin(lifeFactor * Math.PI)) * 0.1;
+
+        lifetimes[i] -= 1;
       }
-
-      // Mover las partículas
-      positions[i3] += velocities[i3];
-      positions[i3 + 1] += velocities[i3 + 1];
-      positions[i3 + 2] += velocities[i3 + 2];
-
-      // Reducir lifetime
-      lifetimes[i] -= 1;
     }
 
     particlesRef.current.geometry.attributes.position.needsUpdate = true;
+    particlesRef.current.geometry.attributes.size.needsUpdate = true;
   });
 
   return (
@@ -145,7 +158,7 @@ const ParticlesInstance: React.FC = () => {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.02}
+        size={0.05}
         sizeAttenuation
         vertexColors
         transparent
