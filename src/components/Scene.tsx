@@ -25,13 +25,31 @@ interface CameraPositions {
   [key: string]: CameraPosition;
 }
 
-// Componente para el Cubo
+// Componente para el Modelo de Entorno
 const EnvironmentModel: React.FC = () => {
-  const { scene } = useGLTF('/Environment7.glb');
-  return <primitive object={scene} />;
+  const { scene } = useGLTF('/Environment5.glb');
+  
+  // Asegurar que el modelo se renderice correctamente
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  }, [scene]);
+  
+  return (
+    <primitive 
+      object={scene} 
+      scale={1} 
+      position={[0, 0, 0]} 
+      rotation={[0, 0, 0]}
+    />
+  );
 };
 
-useGLTF.preload('/Environment7.glb');
+useGLTF.preload('/Environment5.glb');
 
 // Configuración para la animación de las luces principales que iluminan el modelo 3D
 // Estas luces crean un efecto cinematográfico con movimiento dinámico

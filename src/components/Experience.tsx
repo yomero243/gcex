@@ -30,7 +30,7 @@ const Experience: React.FC = () => {
       {/* Controles de cámara movidos a Scene.tsx */}
       
       {/* Objetos 3D */}
-      <fog attach="fog" args={[fogParams.color1, 2, 40]} />
+      {/* <fog attach="fog" args={[fogParams.color1, 2, 40]} /> */}
       <Scene />
       <Particles />
     </>

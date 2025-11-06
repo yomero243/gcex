@@ -5,12 +5,37 @@ import { Observer } from 'gsap/Observer';
 gsap.registerPlugin(Observer);
 
 const sections = [
-  { id: 'inicio', title: '🏠 Entrada', content: 'Bienvenido al pasillo de mi portafolio 3D' },
-  { id: 'sobre-mi', title: '👨‍💻 Sobre Mí', content: 'Primera estación: Conoce mi historia y experiencia' },
-  { id: 'proyectos', title: '🚀 Proyectos', content: 'Segunda estación: Explora mis trabajos destacados' },
-  { id: 'habilidades', title: '💪 Habilidades', content: 'Tercera estación: Mis tecnologías y competencias' },
-  { id: 'contacto', title: '📧 Contacto', content: 'Cuarta estación: Conectemos y trabajemos juntos' },
-  { id: 'cv', title: '📄 CV Completo', content: 'Final del pasillo: Descarga mi currículum completo' }
+  { 
+    id: 'inicio', 
+    title: 'Jose Gabriel Cerdio Oyarzabal', 
+    content: 'Front-End Developer | 3D Artist | Three.js & WebXR Specialist' 
+  },
+  { 
+    id: 'sobre-mi', 
+    title: '👨‍💻 Sobre Mí', 
+    content: 'Front-End Developer y 3D Artist comprometido con la excelencia e innovación, especializado en transformar ideas en soluciones digitales de alto impacto. Experto en crear interfaces interactivas y visualizaciones 3D en tiempo real usando Three.js, WebGL y WebXR para entregar experiencias inmersivas y de alto rendimiento.' 
+  },
+  { 
+    id: 'proyectos', 
+    title: '🚀 Experiencia', 
+    content: 'Front End Developer (Actual) • 3D Engagement Revolution: Plataforma interactiva 3D con Three.js • Digital Efficiency: Arquitectura que redujo tiempos de carga 40% • UI Development: Interfaces para más de 40 aplicaciones con Three.js y WebXR • 3D Designer en Duke Renders (2024) • Freelance 3D Artist en CGTrader (Top Seller)' 
+  },
+  { 
+    id: 'habilidades', 
+    title: '💪 Habilidades Técnicas', 
+    content: '3D Technologies: Three.js, WebXR, WebGL, Unreal Engine, 3D Modeling, Animation, Facial Mocap, Sequencer • Front-End: HTML5, CSS3, JavaScript • Tools: JIRA, SQL, PostgreSQL, Supabase • Certificación: AWS Cloud Practitioner' 
+  },
+  { 
+    id: 'contacto', 
+    title: '📧 Contacto', 
+    content: '📞 +52 2223056478 • ✉️ yo_mero_yo@hotmail.com • 🔗 linkedin.com/in/gabrielcerdio' 
+  },
+  { 
+    id: 'cv', 
+    title: '📄 Educación', 
+    content: 'Unreal Epic Bootcamp 2023 • UT-HUB (06/2023) • Licenciatura en Arquitectura • INSTITUTO DE ESTUDIOS SUPERIORES A.C (2016-2020) • Idiomas: Español (Nativo), Inglés (Competente)',
+    downloadLink: '/ATS-Friendly CVEnglish.pdf'
+  }
 ];
 
 const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: string) => void, activeSection: string }> = ({ className, onSectionChange, activeSection }) => {
@@ -141,9 +166,9 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
   }, [activeSection, goToSlide]);
 
   return (
-    <div className={`${className} fixed inset-0 grid place-items-center z-10 pointer-events-auto`}>
+    <div className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
       <div className="relative">
-        <div ref={sliderRef} className="relative h-[30vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(320px,50vw,550px)] [perspective:1000px] cursor-grab">
+        <div ref={sliderRef} className="relative h-[30vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(320px,50vw,550px)] [perspective:1000px]" style={{ cursor: 'none' }}>
           {sections.map((section, index) => (
             <div
               key={section.id}
@@ -152,6 +177,16 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
             >
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">{section.title}</h2>
               <p className="text-sm sm:text-base text-white/80 mt-4 text-center">{section.content}</p>
+              {'downloadLink' in section && (
+                <a
+                  href={section.downloadLink}
+                  download
+                  className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  📥 Descargar CV PDF
+                </a>
+              )}
             </div>
           ))}
         </div>

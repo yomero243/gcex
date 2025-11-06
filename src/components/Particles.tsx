@@ -12,7 +12,7 @@ interface ParticlesData {
   count: number;
 }
 
-const ParticlesInstance: React.FC = () => {
+const Particles: React.FC = React.memo(() => {
   const particlesRef = useRef<THREE.Points>(null);
   const { viewport, camera } = useThree();
 
@@ -111,7 +111,7 @@ const ParticlesInstance: React.FC = () => {
           velocities[i * 3 + 1] = Math.random() * 0.02 + 0.01;
           velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
 
-          lifetimes[i] = Math.random() * 60 + 60;
+          lifetimes[i] = Math.random() * 120 + 120;
           found++;
         }
       }
@@ -130,8 +130,8 @@ const ParticlesInstance: React.FC = () => {
         positions[i3 + 1] += velocities[i3 + 1];
         positions[i3 + 2] += velocities[i3 + 2];
 
-        const lifeFactor = lifetimes[i] / 120;
-        sizes[i] = (Math.sin(lifeFactor * Math.PI)) * 0.1;
+        const lifeFactor = lifetimes[i] / 240;
+        sizes[i] = (Math.sin(lifeFactor * Math.PI)) * 0.5;
 
         lifetimes[i] -= 1;
       }
@@ -142,7 +142,7 @@ const ParticlesInstance: React.FC = () => {
   });
 
   return (
-    <points ref={particlesRef}>
+    <points ref={particlesRef} frustumCulled={false}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -170,9 +170,6 @@ const ParticlesInstance: React.FC = () => {
       />
     </points>
   );
-};
-
-const Particles = React.memo(ParticlesInstance);
-Particles.displayName = 'Particles';
+});
 
 export default Particles;
