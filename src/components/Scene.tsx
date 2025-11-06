@@ -8,6 +8,9 @@ import {
 import * as THREE from 'three';
 import gsap from "gsap";
 
+
+import Particles from './Particles';
+
 // Interfaces
 interface CameraNavigationEvent extends Event {
   detail: {
@@ -294,6 +297,8 @@ const Scene: React.FC = () => {
       <Lights />
       <EnvironmentModel />
       <CameraController />
+      <Particles />
+
       {/* Efectos de post-procesamiento */}
 
     </>

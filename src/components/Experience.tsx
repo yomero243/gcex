@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import Scene from './Scene';
-import Particles from './Particles';
 import * as THREE from 'three';
 
 const Experience: React.FC = () => {
@@ -32,7 +31,6 @@ const Experience: React.FC = () => {
       {/* Objetos 3D */}
       {/* <fog attach="fog" args={[fogParams.color1, 2, 40]} /> */}
       <Scene />
-      <Particles />
     </>
   );
 };

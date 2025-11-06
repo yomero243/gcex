@@ -2,7 +2,7 @@ import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Experience from './components/Experience';
 import Buttons from './components/Buttons';
-import MouseEffect from './components/MouseEffect';
+
 import ScrollableContent from './components/ScrollableContent';
 import { LoadingScreen } from './components/LoadingScreen';
 
@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div className="w-full font-orbitron">
-      <MouseEffect />
+
       {/* This div is for the 2D UI overlay */}
       <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
         <div className="absolute top-10 left-0 w-full flex justify-between items-center px-10">
@@ -46,7 +46,7 @@ function App() {
       </div>
 
       {/* Container for the 3D Canvas */}
-      <div className={`fixed top-0 left-0 w-full h-screen ${started ? 'z-0' : 'z-30'}`}>
+      <div className={`fixed top-0 left-0 w-full h-screen ${started ? 'z-1' : 'z-30'}`}>
         {started ? (
           <Suspense fallback={null}>
             <Canvas className="w-full h-full">
@@ -59,11 +59,12 @@ function App() {
       </div>
 
       {/* The new carousel-based scrollable content */}
-      <ScrollableContent 
-        className="w-full" 
-        onSectionChange={handleSectionChange} 
-        activeSection={activeSection} 
+      <ScrollableContent
+        className="w-full z-10"
+        onSectionChange={handleSectionChange}
+        activeSection={activeSection}
       />
+
     </div>
   );
 }
