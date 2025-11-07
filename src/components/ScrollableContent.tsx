@@ -161,8 +161,8 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
       target: window, // Escuchar en toda la ventana
       type: "wheel,touch,pointer",
       preventDefault: true,
-      onDown: () => goToSlide(activeIndexRef.current + 1),
-      onUp: () => goToSlide(activeIndexRef.current - 1)
+      onDown: () => goToSlide(activeIndexRef.current - 1),
+      onUp: () => goToSlide(activeIndexRef.current + 1)
     });
 
     const handleMouseMove = (e: MouseEvent) => {

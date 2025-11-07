@@ -140,7 +140,7 @@ const LightsComponent: React.FC = () => {
         ref={keyLightRef}
         position={[3, 4, 5]}              // X: 3 (derecha), Y: 4 (altura media), Z: 5 (delante)
         intensity={2.5}                   // Intensidad: 2.5 (luz principal, más fuerte)
-        color="#ffffff"                   // Color: Blanco puro
+        color="#FFD700"                   // Color: Amarillo dorado
         castShadow                        // Propiedad: Proyecta sombras
         shadow-mapSize-width={1024}       // Propiedad: Resolución de sombras (ancho)
         shadow-mapSize-height={1024}      // Propiedad: Resolución de sombras (alto)
@@ -151,7 +151,7 @@ const LightsComponent: React.FC = () => {
         ref={fillLightRef}
         position={[-2, 2, 3]}             // X: -2 (izquierda), Y: 2 (altura baja), Z: 3 (delante)
         intensity={1.5}                   // Intensidad: 1.5 (más suave que la key light)
-        color="#ffffff"                   // Color: Blanco puro
+        color="#FFFFE0"                   // Color: Amarillo claro
       />
       
       {/* Luz de contorno (Rim Light) - Crea halo de luz alrededor del objeto */}
@@ -159,23 +159,16 @@ const LightsComponent: React.FC = () => {
         ref={rimLightRef}
         position={[-4, 3, -2]}            // X: -4 (izquierda), Y: 3 (altura media), Z: -2 (atrás)
         intensity={2.0}                   // Intensidad: 2.0 (fuerte para crear contraste)
-        color="#ffffff"                   // Color: Blanco puro
+        color="#FFD700"                   // Color: Amarillo dorado
       />
       
      
 
  
-      {/* ===== ILUMINACIÓN AMBIENTAL ===== */}
-      
-      {/* Luz ambiental - Ilumina toda la escena uniformemente */}
-      <directionalLight 
-        intensity={2}                   // Intensidad: 0.1 (muy tenue, solo para evitar negros absolutos)
-        color="#4B4B4B"                   // Color: Marrón oscuro
-      /> 
-      
+     
       {/* Luz hemisférica - Crea gradiente de color en sombras */}
       <hemisphereLight 
-        args={["#ffffff", "#ffffff", 0.6]} // Color arriba: Blanco, Color abajo: Blanco, Intensidad: 0.6
+        args={["#FFD700", "#FFFFE0", 0.6]} // Color arriba: Amarillo dorado, Color abajo: Amarillo claro, Intensidad: 0.6
       />
 
       {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (LUCES DIRECCIONALES POR SECCIÓN) ===== */}
@@ -183,9 +176,9 @@ const LightsComponent: React.FC = () => {
       {/* Direccional 1: Sección INICIO */}
       <directionalLight
         ref={hallwaySpotlight1}
-        position={[0, 10, 2]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
+        position={[0, 10, 0]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
         intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
       
       {/* Direccional 2: Sección SOBRE MÍ */}
@@ -193,7 +186,7 @@ const LightsComponent: React.FC = () => {
         ref={hallwaySpotlight2}
         position={[0, 10, -2]}             // X: 0 (centro), Y: 10 (alto), Z: -2 (primera estación)
         intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
       
       {/* Direccional 3: Sección PROYECTOS */}
@@ -201,7 +194,7 @@ const LightsComponent: React.FC = () => {
         ref={hallwaySpotlight3}
         position={[3, 10, -8]}             // X: 3 (derecha), Y: 10 (alto), Z: -8 (segunda estación)
         intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
       
       {/* Direccional 4: Sección HABILIDADES */}
@@ -209,22 +202,22 @@ const LightsComponent: React.FC = () => {
         ref={hallwaySpotlight4}
         position={[0, 10, -20]}            // X: 0 (centro), Y: 10 (alto), Z: -20 (tercera estación)
         intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
       
       {/* Direccional 5: Sección CONTACTO */}
       <directionalLight
         ref={hallwaySpotlight5}
-        position={[0, 10, -33]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        position={[0, 10, -30]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
+        intensity={.5}                      // Propiedad: Intensidad baja
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
       
       {/* Direccional 6: Sección CV */}
       <directionalLight
-        position={[0, 8, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)
+        position={[0, 10, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)
         intensity={1}                      // Propiedad: Intensidad baja
-        color="#CCCCFF"                    // Propiedad: Color lavanda místico
+        color="#FFFFFF"                    // Propiedad: Color lavanda místico
       />
     </group>
   );

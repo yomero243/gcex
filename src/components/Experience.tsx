@@ -7,8 +7,8 @@ const Experience: React.FC = () => {
   const { scene } = useThree();
 
   const fogParams = useMemo(() => ({
-    color1: '#c5edc5',
-    color2: '#b89575',
+    color1: '#FFD700',
+    color2: '#FFFFE0',
   }), []);
 
   const color1 = useMemo(() => new THREE.Color(fogParams.color1), [fogParams.color1]);

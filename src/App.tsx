@@ -32,8 +32,8 @@ function App() {
       <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
         <div className="absolute top-10 left-0 w-full flex justify-between items-center px-10">
           <div>
-            <h1 className="text-4xl font-bold text-white" style={{ textShadow: '0 0 10px #c5edc5' }}>Mi Portafolio 3D</h1>
-            <p className="text-white/80">Hecho con R3F y Tailwind</p>
+            <h1 className="text-4xl font-bold text-white" style={{ textShadow: '0 0 10px #FFD700' }}>Mi Portafolio 3D</h1>
+            <p className="text-yellow-200/80">Hecho con R3F y Tailwind</p>
           </div>
           <button
             onClick={() => setMenuOpen(!isMenuOpen)}
