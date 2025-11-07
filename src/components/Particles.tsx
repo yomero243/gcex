@@ -104,7 +104,7 @@ const Particles: React.FC = () => {
   });
 
   return (
-    <points ref={pointsRef}>
+    <points ref={pointsRef} frustumCulled={false}>
       <bufferGeometry attach="geometry">
         <bufferAttribute
           attach="attributes-position"
