@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 
 export const SimpleModel = () => {
-  const { scene } = useGLTF('/fake.glb');
+  const { scene } = useGLTF('/variusuvs3.glb');
   return <primitive object={scene} />;
 };

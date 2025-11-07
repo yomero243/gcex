@@ -70,14 +70,13 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
         let stt;
         if (i > activeIndexRef.current) {
           stt = i - activeIndexRef.current;
-          let scale = 1 - 0.3 * stt; // Default scale
-          if (i === 4 || i === 5) {
-            scale = 0.4; // Fixed smaller scale for "Contacto" and "CV"
-          }
+          // Use a more gradual scaling factor
+          let scale = 1 - 0.15 * stt;
           scale = Math.max(0, scale); // Ensure scale is not negative
-          transform = `translateY(${15 * stt}vh) scale(${scale}) perspective(16px) rotateY(-1deg)`;
+          // Use rem for translateY to be independent of viewport height
+          transform = `translateY(${stt * 8}rem) scale(${scale}) perspective(16px) rotateY(-1deg)`;
           zIndex = -stt;
-          filter = 'blur(5px)';
+          filter = `blur(${stt * 2}px)`;
           opacity = stt > 2 ? 0 : 0.6;
         } else {
           stt = activeIndexRef.current - i;
@@ -168,14 +167,14 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
   return (
     <div className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
       <div className="relative">
-        <div ref={sliderRef} className="relative h-[30vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(320px,50vw,550px)] [perspective:1000px]" style={{ cursor: 'none' }}>
+        <div ref={sliderRef} className="relative h-[40vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(280px,90vw,550px)] [perspective:500px]" style={{ cursor: 'none' }}>
           {sections.map((section, index) => (
             <div
               key={section.id}
               ref={el => { itemsRef.current[index] = el! }}
-              className="item absolute top-0 left-0 w-full h-full grid place-items-center text-xl sm:text-2xl md:text-3xl text-white opacity-0 p-4 sm:p-6 md:p-10 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/25 backdrop-blur-[10px] backdrop-saturate-120 overflow-hidden"
+              className="item absolute top-0 left-0 w-full h-full grid place-content-center text-xl sm:text-2xl md:text-3xl text-white opacity-0 p-4 sm:p-6 md:p-10 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/25 backdrop-blur-[10px] backdrop-saturate-120 overflow-hidden"
             >
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">{section.title}</h2>
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-white text-center">{section.title}</h2>
               <p className="text-sm sm:text-base text-white/80 mt-4 text-center">{section.content}</p>
               {'downloadLink' in section && (
                 <a

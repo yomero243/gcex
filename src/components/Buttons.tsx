@@ -36,11 +36,9 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
       }}
     >
       {/* Applying liquid glass style here */}
-      <div className="flex h-screen flex-col justify-between border-l border-white/25 bg-white/5 backdrop-blur-[25px] w-64 shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
+      <div className="flex h-screen flex-col justify-between border-l border-white/25 bg-white/5 backdrop-blur-[10px] backdrop-saturate-120 w-64 shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
         <div className="px-4 py-6">
-          <span className="grid h-10 w-32 place-content-center rounded-lg bg-white/10 text-xs text-white">
-            GCEX
-          </span>
+      
 
           <ul className="mt-6 space-y-1">
             {buttons.map(({ id, label }) => (

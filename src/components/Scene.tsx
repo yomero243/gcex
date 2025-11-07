@@ -30,7 +30,7 @@ interface CameraPositions {
 
 // Componente para el Modelo de Entorno
 const EnvironmentModel: React.FC = () => {
-  const { scene } = useGLTF('/Environment5.glb');
+  const { scene } = useGLTF('/variosuvs3.glb');
   
   // Asegurar que el modelo se renderice correctamente
   useEffect(() => {
@@ -46,13 +46,13 @@ const EnvironmentModel: React.FC = () => {
     <primitive 
       object={scene} 
       scale={1} 
-      position={[0, 0, 0]} 
+      position={[-1.5, 1, 0]} 
       rotation={[0, 0, 0]}
     />
   );
 };
 
-useGLTF.preload('/Environment5.glb');
+useGLTF.preload('/variosuvs3.glb');
 
 // Configuración para la animación de las luces principales que iluminan el modelo 3D
 // Estas luces crean un efecto cinematográfico con movimiento dinámico
@@ -237,12 +237,12 @@ Lights.displayName = 'Lights';
 // Define dónde se posiciona la cámara para cada sección del pasillo
 // Todas las posiciones están a altura de persona (y: 1.5) y centradas (x: 0)
 const cameraPositions: CameraPositions = {
-  inicio:      { x: 0,  y: 1.5, z: 2 },    // X: 0 (centro), Y: 1.5 (altura persona), Z: 2 (entrada del pasillo)
-  "sobre-mi":  { x: 0,  y: 1.5, z: -2 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -2 (primera estación)
-  proyectos:   { x: 0,  y: 1.5, z: -8 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -8 (segunda estación)
-  habilidades: { x: 0,  y: 1.5, z: -20 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -20 (tercera estación)
+  inicio:      { x: 0,  y: 5, z: 2 },    // X: 0 (centro), Y: 1.5 (altura persona), Z: 2 (entrada del pasillo)
+  "sobre-mi":  { x: 0,  y: 1.5, z: -3 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -2 (primera estación)
+  proyectos:   { x: 0,  y: 6, z: -12 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -8 (segunda estación)
+  habilidades: { x: 0,  y: 4, z: -20 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -20 (tercera estación)
   contacto:    { x: 0,  y: 1.5, z: -50 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (cuarta estación)
-  cv:          { x: 0,  y: 1.5, z: -50 }   // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (final del pasillo)
+  cv:          { x: 0,  y: 5, z: -50 }   // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (final del pasillo)
 };
 
 // ===== CONTROLADOR DE CÁMARA =====
