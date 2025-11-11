@@ -226,16 +226,16 @@ const LightsComponent: React.FC = () => {
 const Lights = React.memo(LightsComponent);
 Lights.displayName = 'Lights';
 
-// ===== CONFIGURACIÓN DE POSICIONES DE LA CÁMARA =====
-// Define dónde se posiciona la cámara para cada sección del pasillo
-// Todas las posiciones están a altura de persona (y: 1.5) y centradas (x: 0)
+// ===== CAMERA POSITIONS CONFIGURATION =====
+// Defines where the camera is positioned for each section of the hallway
+// All positions are at person height (y: 1.5) and centered (x: 0)
 const cameraPositions: CameraPositions = {
-  inicio:      { x: 0,  y: 5, z: 2 },    // X: 0 (centro), Y: 1.5 (altura persona), Z: 2 (entrada del pasillo)
-  "sobre-mi":  { x: 0,  y: 1.5, z: -3 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -2 (primera estación)
-  proyectos:   { x: 0,  y: 6, z: -12 },   // X: 0 (centro), Y: 1.5 (altura persona), Z: -8 (segunda estación)
-  habilidades: { x: 0,  y: 4, z: -20 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -20 (tercera estación)
-  contacto:    { x: 0,  y: 1.5, z: -50 },  // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (cuarta estación)
-  cv:          { x: 0,  y: 5, z: -50 }   // X: 0 (centro), Y: 1.5 (altura persona), Z: -50 (final del pasillo)
+  home:      { x: 0,  y: 5, z: 2 },    // X: 0 (center), Y: 1.5 (person height), Z: 2 (hallway entrance)
+  "about-me":  { x: 0,  y: 1.5, z: -3 },   // X: 0 (center), Y: 1.5 (person height), Z: -2 (first station)
+  projects:   { x: 0,  y: 6, z: -12 },   // X: 0 (center), Y: 1.5 (person height), Z: -8 (second station)
+  skills: { x: 0,  y: 4, z: -20 },  // X: 0 (center), Y: 1.5 (person height), Z: -20 (third station)
+  contact:    { x: 0,  y: 1.5, z: -50 },  // X: 0 (center), Y: 1.5 (person height), Z: -50 (fourth station)
+  cv:          { x: 0,  y: 5, z: -50 }   // X: 0 (center), Y: 1.5 (person height), Z: -50 (end of the hallway)
 };
 
 // ===== CONTROLADOR DE CÁMARA =====

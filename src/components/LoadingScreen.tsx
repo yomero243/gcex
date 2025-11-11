@@ -17,7 +17,7 @@ export const LoadingScreen = ({ onStarted }) => {
       <div className="loading-screen__container">
         {!isLoaded ? (
           <>
-            <h1 className="loading-screen__title">Cargando...</h1>
+            <h1 className="loading-screen__title">Loading...</h1>
             <div className="progress-bar">
               <div
                 className="progress-bar__value"
@@ -29,9 +29,9 @@ export const LoadingScreen = ({ onStarted }) => {
           </>
         ) : (
           <>
-            <h1 className="loading-screen__title">Bienvenido</h1>
+            <h1 className="loading-screen__title">Welcome</h1>
             <button className="loading-screen__button" onClick={onStarted}>
-              Entrar
+              Enter
             </button>
           </>
         )}

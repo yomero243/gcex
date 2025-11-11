@@ -8,7 +8,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 
 function App() {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('inicio');
+  const [activeSection, setActiveSection] = useState('home');
   const [started, setStarted] = useState(false);
 
   const handleNavigation = (section: string) => {
@@ -30,16 +30,16 @@ function App() {
 
       {/* This div is for the 2D UI overlay */}
       <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
-        <div className="absolute top-10 left-0 w-full flex justify-between items-center px-10">
+        <div className="absolute top-10 left-0 w-full flex justify-between items-center px-4 sm:px-10">
           <div>
-            <h1 className="text-4xl font-bold text-white" style={{ textShadow: '0 0 10px #FFD700' }}>Mi Portafolio 3D</h1>
-            <p className="text-yellow-200/80">Hecho con R3F y Tailwind</p>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white" style={{ textShadow: '0 0 10px #FFD700' }}>My 3D Portfolio</h1>
+            <p className="text-yellow-200/80">Made with R3F and Tailwind</p>
           </div>
           <button
             onClick={() => setMenuOpen(!isMenuOpen)}
             className="z-20 p-2 text-white bg-black/20 rounded-md hover:bg-white/20 hover:text-black transition-colors shadow-lg pointer-events-auto"
           >
-            {isMenuOpen ? 'Cerrar' : 'Menú'}
+            {isMenuOpen ? 'Close' : 'Menu'}
           </button>
         </div>
         <Buttons isOpen={isMenuOpen} activeSection={activeSection} onNavigate={handleNavigation} />

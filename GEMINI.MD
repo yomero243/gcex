@@ -1,127 +1,128 @@
-# Contexto del Proyecto: GCEX (Gabriel Cerdio Experience)
+# Project Context: GCEX (Gabriel Cerdio Experience)
 
-Este documento sirve como contexto central para el Asistente de IA Gemini sobre el proyecto "GCEX". El objetivo es mantener una memoria coherente del proyecto, sus metas y su stack tecnológico.
+This document serves as the central context for the Gemini AI Assistant regarding the "GCEX" project. The goal is to maintain a coherent memory of the project, its goals, and its technology stack.
 
-## 📜 Resumen del Proyecto
+## 📜 Project Summary
 
-**GCEX** es un **portafolio web interactivo y en 3D** diseñado para mostrar las habilidades de su creador, Jose Gabriel Cerdio Oyarzabal. El proyecto funciona como una experiencia inmersiva, reemplazando un sitio web tradicional por un entorno virtual explorable.
+**GCEX** is an **interactive 3D web portfolio** designed to showcase the skills of its creator, Jose Gabriel Cerdio Oyarzabal. The project functions as an immersive experience, replacing a traditional website with an explorable virtual environment.
 
-La inspiración principal es el portafolio de David Heckhoff ([https://2021.david-hckh.com/](https://2021.david-hckh.com/)).
+The main inspiration is David Heckhoff's portfolio ([https://2021.david-hckh.com/](https://2021.david-hckh.com/)).
 
-## 🎮 Concepto Core y Experiencia de Usuario
+## 🎮 Core Concept and User Experience
 
-La experiencia de usuario es la de un videojuego en tercera persona.
+The user experience is that of a third-person video game.
 
-1.  **El Mundo:** El usuario navega por un **pasillo futurista / industrial** con una estética sci-fi.
-2.  **El Personaje:** El usuario controla un **personaje 3D animado** (obtenido de Mixamo) para caminar por el entorno.
-3.  **La Navegación:** La navegación principal se realiza a través de **puertas interactivas**. Cada puerta, al ser activada, abre una sección del portafolio (CV, Proyectos, Sobre Mí, Contacto) que se muestra como una interfaz de usuario 2D superpuesta.
+1.  **The World:** The user navigates a **futuristic / industrial hallway** with a sci-fi aesthetic.
+2.  **The Character:** The user controls an **animated 3D character** (obtained from Mixamo) to walk through the environment.
+3.  **Navigation:** The main navigation is done through **interactive doors**. Each door, when activated, opens a portfolio section (CV, Projects, About Me, Contact) which is displayed as a 2D overlay UI.
 
-## 💻 Stack Tecnológico
+## 💻 Technology Stack
 
-El proyecto se está construyendo con un stack de tecnologías moderno enfocado en el desarrollo 3D en la web:
+The project is being built with a modern technology stack focused on 3D web development:
 
-* **Build Tool:** **Vite**
-* **Framework Principal:** **React**
-* **Motor 3D:** **Three.js**, implementado a través de:
-    * `@react-three/fiber` (para el renderizado declarativo en React).
-    * `@react-three/drei` (para ayudantes y componentes pre-hechos).
-* **Estilos y UI:** **Tailwind CSS**
+*   **Build Tool:** **Vite**
+*   **Main Framework:** **React**
+*   **3D Engine:** **Three.js**, implemented through:
+    *   `@react-three/fiber` (for declarative rendering in React).
+    *   `@react-three/drei` (for helpers and pre-made components).
+*   **Styles and UI:** **Tailwind CSS**
 
-## 🏛️ Arquitectura de Componentes (React)
+## 🏛️ Component Architecture (React)
 
-El proyecto se estructura separando la lógica 3D (la "Experiencia") de la lógica 2D (la "Interfaz de Usuario").
+The project is structured by separating the 3D logic (the "Experience") from the 2D logic (the "User Interface").
 
-* `App.jsx` (El Cerebro - Orquesta el estado global)
-    * `Experience.jsx` (Contiene el Canvas y todo el mundo 3D)
-        * `World.jsx` (El modelo del pasillo, luces, etc.)
-        * `Character.jsx` (El personaje del jugador y su lógica de control)
-    * `UI.jsx` (Contiene toda la interfaz 2D superpuesta)
-        * `Loader.jsx` (La pantalla de carga inicial)
-        * `Header.jsx` (Logo, botón de menú, etc.)
-        * `PortfolioMenu.jsx` (El menú lateral deslizable)
-        * `ContentContainer.jsx` (Muestra las secciones: Home, About, Work, Contact)
+*   `App.tsx` (The Brain - Orchestrates global state)
+    *   `Experience.tsx` (Contains the Canvas and the entire 3D world)
+        *   `World.tsx` (The hallway model, lights, etc.)
+        *   `Character.tsx` (The player character and its control logic)
+    *   `UI.tsx` (Contains all the overlaid 2D interface)
+        *   `LoadingScreen.tsx` (The initial loading screen)
+        *   `Header.tsx` (Logo, menu button, etc.)
+        *   `PortfolioMenu.tsx` (The sliding side menu)
+        *   `ScrollableContent.tsx` (Displays sections: Home, About, Work, Contact)
 
-### Responsabilidades clave:
-* **`App.jsx`**: Maneja el estado principal (`isLoading`, `currentSection`, `isMenuOpen`).
-* **`Experience.jsx`**: Renderiza la escena 3D con R3F y reacciona a los cambios de estado (ej. mover la cámara).
-* **`UI.jsx`**: Renderiza toda la interfaz 2D y reacciona a los cambios de estado (ej. mostrar/ocultar el menú o una sección de contenido).
+### Key Responsibilities:
 
-## 🎯 Objetivo Final
+*   **`App.tsx`**: Manages the main state (`isLoading`, `currentSection`, `isMenuOpen`).
+*   **`Experience.tsx`**: Renders the 3D scene with R3F and reacts to state changes (e.g., moving the camera).
+*   **`UI.tsx`**: Renders the entire 2D interface and reacts to state changes (e.g., showing/hiding the menu or a content section).
 
-El objetivo es crear un portafolio único y memorable que demuestre de manera práctica la **doble especialidad** del creador como **Artista 3D y Desarrollador Front-End**, destacando su experiencia en la creación de experiencias interactivas en tiempo real para la web.
+## 🎯 Final Goal
 
-# GCEX (Cerdio Experience): Diseño Técnico Detallado
+The goal is to create a unique and memorable portfolio that practically demonstrates the creator's **dual specialization** as a **3D Artist and Front-End Developer**, highlighting their experience in creating interactive real-time web experiences.
+
+# GCEX (Cerdio Experience): Detailed Technical Design
 
 ---
 
-Este documento técnico describe la arquitectura de la aplicación **GCEX**, un portafolio web interactivo 3D. El diseño se enfoca en la **interoperabilidad** entre el entorno 3D (Three.js/R3F) y la Interfaz de Usuario 2D (React/Tailwind), y en la gestión del *gameplay* en tercera persona.
+This technical document describes the architecture of the **GCEX** application, an interactive 3D web portfolio. The design focuses on **interoperability** between the 3D environment (Three.js/R3F) and the 2D User Interface (React/Tailwind), and on managing third-person gameplay.
 
-## 1. Stack Tecnológico y Propósito
+## 1. Technology Stack and Purpose
 
-| Componente | Tecnología | Rol Principal |
+| Component | Technology | Main Role |
 | :--- | :--- | :--- |
-| **Build** | **Vite** | Empaquetador ultra rápido, HMR. |
-| **Framework** | **React** | Lógica de la aplicación y gestión de la UI 2D. |
-| **3D Rendering** | **@react-three/fiber (R3F)** | Integración declarativa de Three.js en el ecosistema React. |
-| **Físicas** | **@react-three/rapier** | Simulación de colisiones y gravedad para el personaje y el mundo. |
-| **Estilos/UI** | **Tailwind CSS** | Sistema de utilidad para estilos rápidos y optimización de CSS. |
-| **Estado** | **Zustand** | *Store* global ligero para sincronizar 3D y 2D. |
+| **Build** | **Vite** | Ultra-fast bundler, HMR. |
+| **Framework** | **React** | Application logic and 2D UI management. |
+| **3D Rendering** | **@react-three/fiber (R3F)** | Declarative integration of Three.js into the React ecosystem. |
+| **Physics** | **@react-three/rapier** | Collision and gravity simulation for the character and the world. |
+| **Styles/UI** | **Tailwind CSS** | Utility system for rapid styling and CSS optimization. |
+| **State** | **Zustand** | Lightweight global *store* for synchronizing 3D and 2D.
 
 ---
 
-## 2. Arquitectura de Estado (Zustand)
+## 2. State Architecture (Zustand)
 
-El **Estado Global** es el puente central. Todos los módulos (3D, 2D) se suscriben a él para reaccionar a los eventos clave.
+The **Global State** is the central bridge. All modules (3D, 2D) subscribe to it to react to key events.
 
-| Variable de Estado | Tipo | Descripción | Componentes Impactados |
+| State Variable | Type | Description | Impacted Components |
 | :--- | :--- | :--- | :--- |
-| **`isLoading`** | `boolean` | `true` mientras se cargan modelos/texturas. Oculta el `Loader.jsx`. | `Loader.jsx`, `App.jsx` |
-| **`currentSection`** | `string` | ID de la puerta abierta ("CV", "Proyectos", etc.). Controla el contenido 2D. | `ContentContainer.jsx` |
-| **`isContentOpen`** | `boolean` | Indica si una sección 2D está visible. **Bloquea** el control del personaje. | `Character.jsx`, `UI.jsx` |
-| **`isNearDoor`** | `boolean` | El personaje está en rango de interacción con una puerta. | `Character.jsx` |
+| **`isLoading`** | `boolean` | `true` while models/textures are loading. Hides `LoadingScreen.tsx`. | `LoadingScreen.tsx`, `App.tsx` |
+| **`currentSection`** | `string` | ID of the open door ("home", "projects", etc.). Controls 2D content. | `ScrollableContent.tsx` |
+| **`isContentOpen`** | `boolean` | Indicates if a 2D section is visible. **Blocks** character control. | `Character.tsx`, `UI.tsx` |
+| **`isNearDoor`** | `boolean` | The character is within interaction range of a door. | `Character.tsx` |
 
-**Acciones Clave:**
+**Key Actions:**
 
-* `useStore.getState().triggerDoor(name)`: Llamado por `Character.jsx` para abrir la sección 2D.
-* `useStore.getState().closeContent()`: Llamado por el botón "Cerrar" del `ContentContainer.jsx`.
+*   `useStore.getState().triggerDoor(name)`: Called by `Character.tsx` to open the 2D section.
+*   `useStore.getState().closeContent()`: Called by the "Close" button of `ScrollableContent.tsx`.
 
 ---
 
-## 3. Módulo 3D: Experiencia de Juego (`Experience.jsx`)
+## 3. 3D Module: Game Experience (`Experience.tsx`)
 
-### 3.1. `Character.jsx` (El Player)
+### 3.1. `Character.tsx` (The Player)
 
-| Aspecto | Implementación Técnica | Detalles Clave |
+| Aspect | Technical Implementation | Key Details |
 | :--- | :--- | :--- |
-| **Movimiento/Control** | **Hooks de R3F y React.** Control de teclado mapeado a **Rapier** (`RigidBody` del personaje). | Movimiento desactivado (`isContentOpen = true`). Solo **Rapier** aplica el movimiento para garantizar la colisión. |
-| **Físicas** | **`@react-three/rapier`**. Cápsula del personaje como `RigidBody`. | Detección de colisiones *sweep* y *raycasting* para evitar errores de penetración y caída. |
-| **Interacción** | **Sensores de Rapier** (o geometría invisible) definidos en el área de la puerta. | Al intersectar con el sensor, se activa `isNearDoor = true` y se muestra el *prompt* de interacción 2D (usando el componente **`Html` de `drei`**). |
-| **Animación** | **`useAnimations`** (de `drei`) para transiciones fluidas entre estados (Idle, Walk). | Las animaciones se sincronizan con la velocidad calculada por Rapier. |
+| **Movement/Control** | **R3F and React Hooks.** Keyboard control mapped to **Rapier** (character's `RigidBody`). | Movement disabled (`isContentOpen = true`). Only **Rapier** applies movement to ensure collision. |
+| **Physics** | **`@react-three/rapier`**. Character capsule as `RigidBody`. | Sweep collision detection and raycasting to prevent penetration and falling errors. |
+| **Interaction** | **Rapier Sensors** (or invisible geometry) defined in the door area. | When intersecting with the sensor, `isNearDoor = true` is activated and the 2D interaction prompt is displayed (using `drei`'s **`Html`** component). |
+| **Animation** | **`useAnimations`** (from `drei`) for fluid transitions between states (Idle, Walk). | Animations are synchronized with the speed calculated by Rapier. |
 
-### 3.2. `World.jsx` (El Entorno)
+### 3.2. `World.tsx` (The Environment)
 
-* **Modelo Base:** Carga el GLB del pasillo. El modelo debe tener una **geometría de colisión simplificada** separada para Rapier, si el modelo visual es demasiado complejo.
-* **Puntos de Interacción:** Ubicaciones exactas de los sensores de colisión (`Rapier Sensor`) que representan las puertas. Cada sensor tiene una `userData` que mapea su posición al nombre de la sección (`"CV_Door"`).
-
----
-
-## 4. Módulo 2D: Interfaz de Usuario (`UI.jsx`)
-
-La UI es puramente **React** y **Tailwind**, superpuesta al `Canvas` 3D.
-
-### 4.1. `UIOverlay.jsx` (Contenedor General)
-
-* **Bloqueo de Interacción:** Usa la variable `isContentOpen`. Si es `true`, aplica estilos (`z-10`, `opacity-100`) para cubrir el mundo 3D y absorber los eventos del mouse.
-* **Transiciones:** Usa las utilidades de **Tailwind** para las transiciones CSS (e.g., `transition-opacity`, `duration-500`) al abrir/cerrar el contenido.
-
-### 4.2. `ContentContainer.jsx` (Vista de Contenido)
-
-* **Renderizado Condicional:** Usa `currentSection` para renderizar el componente de contenido específico (e.g., `<CVView />`, `<ProjectsView />`).
-* **Botón de Cierre:** Llama a la función de estado `closeContent()` (Zustand) para cerrar la UI 2D y reactivar el control del personaje 3D.
+*   **Base Model:** Loads the hallway GLB. The model should have a **simplified collision geometry** separate for Rapier, if the visual model is too complex.
+*   **Interaction Points:** Exact locations of the collision sensors (`Rapier Sensor`) representing the doors. Each sensor has `userData` that maps its position to the section name (`"CV_Door"`).
 
 ---
 
-## Dicotomía del Diseño
+## 4. 2D Module: User Interface (`UI.tsx`)
 
-* **El Enfoque Híbrido (GCEX):** La complejidad recae en la **sincronización del estado**, pero el resultado es una experiencia de usuario única donde el 3D y el 2D coexisten de manera fluida.
-* **El Enfoque Tradicional:** El código 3D y la UI 2D se mantienen completamente separados (sin R3F/Zustand), resultando en una **carga de trabajo duplicada** y dificultades para coordinar la lógica de *gameplay* (p. ej., bloquear el movimiento).
+The UI is purely **React** and **Tailwind**, overlaid on the 3D `Canvas`.
+
+### 4.1. `UIOverlay.tsx` (General Container)
+
+*   **Interaction Blocking:** Uses the `isContentOpen` variable. If `true`, it applies styles (`z-10`, `opacity-100`) to cover the 3D world and absorb mouse events.
+*   **Transitions:** Uses **Tailwind** utilities for CSS transitions (e.g., `transition-opacity`, `duration-500`) when opening/closing content.
+
+### 4.2. `ScrollableContent.tsx` (Content View)
+
+*   **Conditional Rendering:** Uses `currentSection` to render the specific content component (e.g., `<CVView />`, `<ProjectsView />`).
+*   **Close Button:** Calls the `closeContent()` state function (Zustand) to close the 2D UI and reactivate 3D character control.
+
+---
+
+## Design Dichotomy
+
+*   **The Hybrid Approach (GCEX):** Complexity lies in **state synchronization**, but the result is a unique user experience where 3D and 2D coexist fluidly.
+*   **The Traditional Approach:** 3D code and 2D UI are kept completely separate (without R3F/Zustand), resulting in **duplicated workload** and difficulties in coordinating gameplay logic (e.g., blocking movement).

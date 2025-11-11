@@ -6,41 +6,41 @@ gsap.registerPlugin(Observer);
 
 const sections = [
   { 
-    id: 'inicio', 
+    id: 'home', 
     title: 'Jose Gabriel Cerdio Oyarzabal', 
     content: 'Front-End Developer | 3D Artist | Three.js & WebXR Specialist' 
   },
   { 
-    id: 'sobre-mi', 
-    title: 'Sobre Mí', 
-    content: 'Front-End Developer y 3D Artist comprometido con la excelencia e innovación, especializado en transformar ideas en soluciones digitales de alto impacto. Experto en crear interfaces interactivas y visualizaciones 3D en tiempo real usando Three.js, WebGL y WebXR para entregar experiencias inmersivas y de alto rendimiento.' 
+    id: 'about-me', 
+    title: 'About Me', 
+    content: 'Front-End Developer and 3D Artist committed to excellence and innovation, specialized in transforming ideas into high-impact digital solutions. Expert in creating interactive interfaces and real-time 3D visualizations using Three.js, WebGL, and WebXR to deliver immersive, high-performance experiences.' 
   },
   {
-    id: 'proyectos',
-    title: 'Experiencia y Proyectos',
+    id: 'projects',
+    title: 'Experience and Projects',
     projects: [
       {
-        title: 'Air Hockey 3D (Juego Web)',
-        description: 'Juego de Air Hockey 3D con física de colisiones en tiempo real, hecho con Three.js.',
+        title: 'Air Hockey 3D (Web Game)',
+        description: '3D Air Hockey game with real-time collision physics, made with Three.js.',
         livePreviewUrl: 'https://airhokey-3d.netlify.app/'
       },
       {
-        title: 'Plataforma de Engagement 3D',
-        description: 'Plataforma 3D interactiva para clientes usando Three.js para crear experiencias inmersivas.'
+        title: '3D Engagement Platform',
+        description: 'Interactive 3D platform for clients using Three.js to create immersive experiences.'
       },
       {
-        title: 'Optimización de Arquitectura Front-End',
-        description: 'Re-arquitectura de sistemas Front-End, logrando una reducción del 40% en tiempos de carga.'
+        title: 'Front-End Architecture Optimization',
+        description: 'Re-architecture of Front-End systems, achieving a 40% reduction in loading times.'
       },
       {
-        title: 'Artista 3D Freelance (Top Seller)',
-        description: 'Artista 3D Top Seller en CGTrader, especializado en modelos de alta calidad para tiempo real.'
+        title: 'Freelance 3D Artist (Top Seller)',
+        description: 'Top Seller 3D Artist on CGTrader, specializing in high-quality models for real-time applications.'
       }
     ]
   },
   { 
-    id: 'habilidades', 
-    title: 'Habilidades Técnicas',
+    id: 'skills', 
+    title: 'Technical Skills',
     skills: {
       '3D Technologies': ['Three.js', 'WebXR', 'WebGL', 'Unreal Engine', '3D Modeling', 'Animation', 'Facial Mocap', 'Sequencer'],
       'Front-End': ['HTML5', 'CSS3', 'JavaScript', 'React', 'TailwindCSS'],
@@ -49,8 +49,8 @@ const sections = [
     }
   },
   {
-    id: 'contacto',
-    title: 'Contacto',
+    id: 'contact',
+    title: 'Contact',
     email: 'yo_mero_yo@hotmail.com',
     phone: '+52 2223056478',
     socials: [
@@ -61,7 +61,7 @@ const sections = [
   },
   { 
     id: 'cv', 
-    title: 'Educación',
+    title: 'Education',
     education: [
       {
         title: 'Unreal Epic Bootcamp 2023',
@@ -69,14 +69,14 @@ const sections = [
         date: '06/2023'
       },
       {
-        title: 'Licenciatura en Arquitectura',
+        title: 'Bachelor of Architecture',
         institution: 'INSTITUTO DE ESTUDIOS SUPERIORES A.C',
         date: '2016-2020'
       }
     ],
     languages: [
-      { lang: 'Español', level: 'Nativo' },
-      { lang: 'Inglés', level: 'Proficient C1' }
+      { lang: 'Spanish', level: 'Native' },
+      { lang: 'English', level: 'Proficient C1' }
     ],
     downloadLink: '/ATS-Friendly CVEnglish.pdf'
   }
@@ -211,16 +211,16 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
     }
   }, [activeSection, goToSlide]);
 
-  const isProjectsActive = activeSection === 'proyectos';
-  const isSkillsActive = activeSection === 'habilidades';
+  const isProjectsActive = activeSection === 'projects';
+  const isSkillsActive = activeSection === 'skills';
 
   const getContainerClasses = () => {
     if (isProjectsActive) {
-      return 'h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[85vh] w-[clamp(320px,95vw,700px)]';
+      return 'h-[70vh] sm:h-[75vh] md:h-[80vh] lg:h-[85vh] w-[clamp(300px,90vw,700px)]';
     } else if (isSkillsActive) {
-      return 'h-[60vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(280px,90vw,550px)]';
+      return 'h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] w-[clamp(280px,85vw,550px)]';
     } else {
-      return 'h-[40vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(280px,90vw,550px)]';
+      return 'h-[50vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-[clamp(280px,85vw,550px)]';
     }
   };
 
@@ -239,25 +239,25 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
             <div
               key={section.id}
               ref={el => { itemsRef.current[index] = el! }}
-              className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[8px] overflow-y-auto"
+              className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-8 sm:pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[8px] overflow-y-auto"
             >
-              <h2 className="text-xl sm:text-2xl font-bold text-white text-center mb-4 flex-shrink-0">{section.title}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-4 flex-shrink-0">{section.title}</h2>
               
-              <div className="w-full text-sm sm:text-base text-white/80 text-center flex-grow overflow-y-auto px-2">
+              <div className="w-full text-base sm:text-lg text-white/80 text-center flex-grow overflow-y-auto px-2">
                 {(section as any).education ? (
                   <div>
                     <ul className="space-y-4">
                       {(section as any).education.map((edu: any, index: number) => (
                         <li key={index}>
                           <p className="font-semibold text-white">{edu.title}</p>
-                          <p className="text-sm text-white/70">{edu.institution}</p>
-                          <p className="text-xs text-white/50">{edu.date}</p>
+                          <p className="text-base sm:text-lg text-white/70">{edu.institution}</p>
+                          <p className="text-sm text-white/50">{edu.date}</p>
                         </li>
                       ))}
                     </ul>
                     <div className="mt-6">
-                      <h3 className="font-bold text-white text-md sm:text-lg mb-2">Idiomas</h3>
-                      <ul className="space-y-2 text-sm">
+                      <h3 className="font-bold text-white text-lg sm:text-xl mb-2">Languages</h3>
+                      <ul className="space-y-2 text-base sm:text-lg">
                         {(section as any).languages.map((lang: any, index: number) => (
                           <li key={index} className="flex justify-center space-x-2">
                             <span>{lang.lang}:</span>
@@ -271,10 +271,10 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
                   <div className="w-full">
                     {Object.entries((section as any).skills).map(([category, skillsList]) => (
                       <div key={category} className="mb-4">
-                        <h3 className="font-bold text-white text-center text-md sm:text-lg mb-3">{category}</h3>
+                        <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-3">{category}</h3>
                         <div className="flex flex-wrap justify-center gap-2">
                           {(skillsList as string[]).map((skill) => (
-                            <span key={skill} className="bg-white/10 text-white px-3 py-1 rounded-full text-xs">
+                            <span key={skill} className="bg-white/10 text-white px-3 py-1 rounded-full text-sm">
                               {skill}
                             </span>
                           ))}
@@ -286,18 +286,18 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
                   <div className="w-full">
                     {(section as any).projects.map((project: any, index: number) => (
                       <div key={index} className="mb-6 last:mb-0">
-                        <h3 className="font-bold text-white text-center text-md sm:text-lg mb-2">{project.title}</h3>
-                        <p className="text-center text-sm sm:text-base mb-3">{project.description}</p>
+                        <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-2">{project.title}</h3>
+                        <p className="text-center text-base sm:text-lg mb-3">{project.description}</p>
                         {project.livePreviewUrl && (
                           <div className="text-center mt-4">
                             <a
                               href={project.livePreviewUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-block px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm"
+                              className="inline-block px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              Ver Proyecto en Vivo
+                              Live Preview
                             </a>
                           </div>
                         )}
@@ -321,7 +321,7 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
                           href={social.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/25 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm"
+                          className="inline-block px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/25 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {social.name}
@@ -339,10 +339,10 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
                   <a
                     href={(section as any).downloadLink}
                     download
-                    className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+                    className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    📥 Descargar CV
+                    📥 Download CV
                   </a>
                 </div>
               )}

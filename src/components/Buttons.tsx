@@ -16,11 +16,11 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
   };
 
   const buttons = [
-    { id: "inicio", label: "Inicio" },
-    { id: "sobre-mi", label: "Sobre mí" },
-    { id: "proyectos", label: "Proyectos" },
-    { id: "habilidades", label: "Habilidades" },
-    { id: "contacto", label: "Contacto" },
+    { id: "home", label: "Home" },
+    { id: "about-me", label: "About me" },
+    { id: "projects", label: "Projects" },
+    { id: "skills", label: "Skills" },
+    { id: "contact", label: "Contact" },
     { id: "cv", label: "CV" }
   ];
 
@@ -63,9 +63,9 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
             />
 
             <div>
-              <p className="text-xs text-white">
+              <p className="text-sm text-white">
                 <strong className="block font-medium">Jose Gabriel Cerdio Oyarzabal</strong>
-                <span className="text-white/70">j.g.cerdio@email.com</span>
+                <span className="text-white/70">yo_mero_yo@hotmail.com</span>
               </p>
             </div>
           </a>

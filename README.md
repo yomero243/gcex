@@ -1,16 +1,46 @@
-# React + Vite
+# GCEX - 3D Interactive Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+GCEX is an interactive 3D web portfolio designed to showcase the skills of its creator, Jose Gabriel Cerdio Oyarzabal. The project works as an immersive experience, replacing a traditional website with an explorable virtual environment.
 
-Currently, two official plugins are available:
+//
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[**Live Demo**](https://gcex.netlify.app/)
 
-## React Compiler
+## 🚀 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Build Tool:** [Vite](https://vitejs.dev/)
+- **Framework:** [React](https://reactjs.org/)
+- **3D Engine:** [Three.js](https://threejs.org/)
+  - `@react-three/fiber`
+  - `@react-three/drei`
+- **Physics:** `@react-three/rapier`
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/)
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Interactive 3D World:** Explore a futuristic hallway with a third-person character.
+- **Animated Character:** The 3D character has idle and walking animations.
+- **Interactive Doors:** Each door opens a different section of the portfolio.
+- **2D UI Overlay:** The portfolio sections are displayed as a 2D UI on top of the 3D world.
+- **Responsive Design:** The portfolio is designed to be responsive and work on different screen sizes.
+
+## 📦 How to run it locally
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/yomero243/gcex.git
+    ```
+2.  Install the dependencies:
+    ```bash
+    npm install
+    ```
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
+4.  Open your browser and go to `http://localhost:5173/`
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
