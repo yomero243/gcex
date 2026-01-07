@@ -1,4 +1,5 @@
 import React from 'react';
+import profilePic from '../assets/1764179662424.jpg';
 
 interface ButtonsProps {
   isOpen: boolean;
@@ -8,11 +9,10 @@ interface ButtonsProps {
 
 const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) => {
   const getButtonClasses = (section: string): string => {
-    return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-      activeSection === section
+    return `block w-full text-left rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${activeSection === section
         ? "bg-white/25 border border-white/40 text-white" // Active state with more emphasis
         : "text-white/70 hover:bg-white/10 hover:text-white border border-transparent"
-    }`;
+      }`;
   };
 
   const buttons = [
@@ -38,7 +38,7 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
       {/* Applying liquid glass style here */}
       <div className="flex h-screen flex-col justify-between border-l border-white/25 bg-white/5 backdrop-blur-[10px] backdrop-saturate-120 w-64 shadow-[0_15px_50px_rgba(0,0,0,0.4)]">
         <div className="px-4 py-6">
-      
+
 
           <ul className="mt-6 space-y-1">
             {buttons.map(({ id, label }) => (
@@ -58,7 +58,7 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
           <a href="#" className="flex items-center gap-2 p-4 hover:bg-white/10">
             <img
               alt="Jose Gabriel Cerdio Oyarzabal"
-              src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+              src={profilePic}
               className="size-10 rounded-full object-cover"
             />
 

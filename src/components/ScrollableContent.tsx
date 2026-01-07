@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useCallback } from 'react';
+import profilePic from '../assets/1764179662424.jpg';
 import gsap from 'gsap';
 import { Observer } from 'gsap/Observer';
 
 gsap.registerPlugin(Observer);
 
 const sections = [
-  { 
-    id: 'home', 
-    title: 'Jose Gabriel Cerdio Oyarzabal', 
-    content: 'Front-End Developer | 3D Artist | Three.js & WebXR Specialist' 
+  {
+    id: 'home',
+    title: 'Jose Gabriel Cerdio Oyarzabal',
+    content: 'Front-End Developer | 3D Artist | Three.js & WebXR Specialist'
   },
-  { 
-    id: 'about-me', 
-    title: 'About Me', 
-    content: 'Front-End Developer and 3D Artist committed to excellence and innovation, specialized in transforming ideas into high-impact digital solutions. Expert in creating interactive interfaces and real-time 3D visualizations using Three.js, WebGL, and WebXR to deliver immersive, high-performance experiences.' 
+  {
+    id: 'about-me',
+    title: 'About Me',
+    content: 'Front-End Developer and 3D Artist committed to excellence and innovation, specialized in transforming ideas into high-impact digital solutions. Expert in creating interactive interfaces and real-time 3D visualizations using Three.js, WebGL, and WebXR to deliver immersive, high-performance experiences.'
   },
   {
     id: 'projects',
@@ -38,8 +39,8 @@ const sections = [
       }
     ]
   },
-  { 
-    id: 'skills', 
+  {
+    id: 'skills',
     title: 'Technical Skills',
     skills: {
       '3D Technologies': ['Three.js', 'WebXR', 'WebGL', 'Unreal Engine', '3D Modeling', 'Animation', 'Facial Mocap', 'Sequencer'],
@@ -59,8 +60,8 @@ const sections = [
       { name: 'ArtStation', url: 'https://www.artstation.com/yomero243' }
     ]
   },
-  { 
-    id: 'cv', 
+  {
+    id: 'cv',
     title: 'Education',
     education: [
       {
@@ -227,8 +228,8 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
   return (
     <div className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
       <div className="relative">
-        <div 
-          ref={sliderRef} 
+        <div
+          ref={sliderRef}
           className={`
             ${getContainerClasses()}
             relative [perspective:500px] transition-all duration-500 ease-in-out
@@ -241,8 +242,15 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
               ref={el => { itemsRef.current[index] = el! }}
               className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-8 sm:pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[8px] overflow-y-auto"
             >
+              {section.id === 'home' && (
+                <img
+                  src={profilePic}
+                  alt={section.title}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white/20 shadow-lg mb-6 flex-shrink-0"
+                />
+              )}
               <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-4 flex-shrink-0">{section.title}</h2>
-              
+
               <div className="w-full text-base sm:text-lg text-white/80 text-center flex-grow overflow-y-auto px-2">
                 {(section as any).education ? (
                   <div>

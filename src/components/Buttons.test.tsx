@@ -3,17 +3,17 @@ import Buttons from './Buttons';
 
 describe('Buttons component', () => {
   const buttons = [
-    { id: "inicio", label: "Inicio" },
-    { id: "sobre-mi", label: "Sobre mí" },
-    { id: "proyectos", label: "Proyectos" },
-    { id: "habilidades", label: "Habilidades" },
-    { id: "contacto", label: "Contacto" },
+    { id: "home", label: "Home" },
+    { id: "about-me", label: "About me" },
+    { id: "projects", label: "Projects" },
+    { id: "skills", label: "Skills" },
+    { id: "contact", label: "Contact" },
     { id: "cv", label: "CV" }
   ];
 
   it('should render all navigation buttons', () => {
-    render(<Buttons isOpen={true} activeSection="inicio" onNavigate={() => {}} />);
-    
+    render(<Buttons isOpen={true} activeSection="home" onNavigate={() => { }} />);
+
     buttons.forEach(button => {
       expect(screen.getByText(button.label)).toBeInTheDocument();
     });
@@ -21,25 +21,25 @@ describe('Buttons component', () => {
 
   it('should call onNavigate with the correct section id when a button is clicked', () => {
     const onNavigate = vi.fn();
-    render(<Buttons isOpen={true} activeSection="inicio" onNavigate={onNavigate} />);
-    
-    const proyectosButton = screen.getByText('Proyectos');
-    fireEvent.click(proyectosButton);
-    
-    expect(onNavigate).toHaveBeenCalledWith('proyectos');
+    render(<Buttons isOpen={true} activeSection="home" onNavigate={onNavigate} />);
+
+    const projectsButton = screen.getByText('Projects');
+    fireEvent.click(projectsButton);
+
+    expect(onNavigate).toHaveBeenCalledWith('projects');
   });
 
   it('should apply active styles to the active button', () => {
-    render(<Buttons isOpen={true} activeSection="proyectos" onNavigate={() => {}} />);
-    
-    const proyectosButton = screen.getByText('Proyectos');
-    expect(proyectosButton.className).toContain('bg-white/25');
+    render(<Buttons isOpen={true} activeSection="projects" onNavigate={() => { }} />);
+
+    const projectsButton = screen.getByText('Projects');
+    expect(projectsButton.className).toContain('bg-white/25');
   });
 
   it('should not apply active styles to inactive buttons', () => {
-    render(<Buttons isOpen={true} activeSection="proyectos" onNavigate={() => {}} />);
-    
-    const inicioButton = screen.getByText('Inicio');
-    expect(inicioButton.className).not.toContain('bg-white/25');
+    render(<Buttons isOpen={true} activeSection="projects" onNavigate={() => { }} />);
+
+    const homeButton = screen.getByText('Home');
+    expect(homeButton.className).not.toContain('bg-white/25');
   });
 });
