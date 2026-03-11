@@ -55,7 +55,7 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
         </div>
 
         <div className="sticky inset-x-0 bottom-0 border-t border-white/25">
-          <a href="#" className="flex items-center gap-2 p-4 hover:bg-white/10">
+          <div className="flex items-center gap-2 p-4 hover:bg-white/10">
             <img
               alt="Jose Gabriel Cerdio Oyarzabal"
               src={profilePic}
@@ -68,7 +68,7 @@ const Buttons: React.FC<ButtonsProps> = ({ isOpen, activeSection, onNavigate }) 
                 <span className="text-white/70">yo_mero_yo@hotmail.com</span>
               </p>
             </div>
-          </a>
+          </div>
         </div>
       </div>
     </div>

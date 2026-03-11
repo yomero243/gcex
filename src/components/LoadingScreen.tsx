@@ -1,8 +1,12 @@
+import React, { useEffect, useState } from "react";
 import { useProgress } from "@react-three/drei";
-import { useEffect, useState } from "react";
 import "./LoadingScreen.css";
 
-export const LoadingScreen = ({ onStarted }) => {
+interface LoadingScreenProps {
+  onStarted: () => void;
+}
+
+export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onStarted }) => {
   const { progress } = useProgress();
   const [isLoaded, setIsLoaded] = useState(false);
 
