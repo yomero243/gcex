@@ -13,16 +13,7 @@ function App() {
 
   const handleNavigation = (section: string) => {
     setActiveSection(section);
-    window.dispatchEvent(new CustomEvent('camera-navigation', { 
-      detail: { section: section } 
-    }));
-  };
-
-  const handleSectionChange = (section: string) => {
-    setActiveSection(section);
-    window.dispatchEvent(new CustomEvent('camera-navigation', { 
-      detail: { section: section } 
-    }));
+    window.dispatchEvent(new CustomEvent('camera-navigation', { detail: { section } }));
   };
 
   return (
@@ -61,7 +52,7 @@ function App() {
       {/* The new carousel-based scrollable content */}
       <ScrollableContent
         className="w-full z-10"
-        onSectionChange={handleSectionChange}
+        onSectionChange={handleNavigation}
         activeSection={activeSection}
       />
 

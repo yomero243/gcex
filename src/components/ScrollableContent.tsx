@@ -5,7 +5,80 @@ import { Observer } from 'gsap/Observer';
 
 gsap.registerPlugin(Observer);
 
-const sections = [
+// ===== TYPES =====
+
+interface Project {
+  title: string;
+  description: string;
+  livePreviewUrl?: string;
+}
+
+interface Education {
+  title: string;
+  institution: string;
+  date: string;
+}
+
+interface Language {
+  lang: string;
+  level: string;
+}
+
+interface Social {
+  name: string;
+  url: string;
+}
+
+interface BaseSection {
+  id: string;
+  title: string;
+}
+
+interface HomeSection extends BaseSection {
+  id: 'home';
+  content: string;
+}
+
+interface AboutSection extends BaseSection {
+  id: 'about-me';
+  content: string;
+}
+
+interface ProjectsSection extends BaseSection {
+  id: 'projects';
+  projects: Project[];
+}
+
+interface SkillsSection extends BaseSection {
+  id: 'skills';
+  skills: Record<string, string[]>;
+}
+
+interface ContactSection extends BaseSection {
+  id: 'contact';
+  email: string;
+  phone: string;
+  socials: Social[];
+}
+
+interface CVSection extends BaseSection {
+  id: 'cv';
+  education: Education[];
+  languages: Language[];
+  downloadLink: string;
+}
+
+type Section =
+  | HomeSection
+  | AboutSection
+  | ProjectsSection
+  | SkillsSection
+  | ContactSection
+  | CVSection;
+
+// ===== DATA =====
+
+const sections: Section[] = [
   {
     id: 'home',
     title: 'Jose Gabriel Cerdio Oyarzabal',
@@ -83,7 +156,121 @@ const sections = [
   }
 ];
 
-const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: string) => void, activeSection: string }> = ({ className, onSectionChange, activeSection }) => {
+// ===== SECTION RENDERERS =====
+
+const renderSectionContent = (section: Section) => {
+  if (section.id === 'cv') {
+    return (
+      <div>
+        <ul className="space-y-4">
+          {section.education.map((edu, index) => (
+            <li key={index}>
+              <p className="font-semibold text-white">{edu.title}</p>
+              <p className="text-base sm:text-lg text-white/70">{edu.institution}</p>
+              <p className="text-sm text-white/50">{edu.date}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6">
+          <h3 className="font-bold text-white text-lg sm:text-xl mb-2">Languages</h3>
+          <ul className="space-y-2 text-base sm:text-lg">
+            {section.languages.map((lang, index) => (
+              <li key={index} className="flex justify-center space-x-2">
+                <span>{lang.lang}:</span>
+                <span className="font-semibold">{lang.level}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
+  if (section.id === 'skills') {
+    return (
+      <div className="w-full">
+        {Object.entries(section.skills).map(([category, skillsList]) => (
+          <div key={category} className="mb-4">
+            <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-3">{category}</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              {skillsList.map((skill) => (
+                <span key={skill} className="bg-white/10 text-white px-3 py-1 rounded-full text-sm">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (section.id === 'projects') {
+    return (
+      <div className="w-full">
+        {section.projects.map((project, index) => (
+          <div key={index} className="mb-6 last:mb-0">
+            <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-2">{project.title}</h3>
+            <p className="text-center text-base sm:text-lg mb-3">{project.description}</p>
+            {project.livePreviewUrl && (
+              <div className="text-center mt-4">
+                <a
+                  href={project.livePreviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Live Preview
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (section.id === 'contact') {
+    return (
+      <div className="w-full">
+        <p className="mb-4">
+          <a href={`mailto:${section.email}`} className="hover:text-white transition-colors">
+            {section.email}
+          </a>
+        </p>
+        <p className="mb-6">{section.phone}</p>
+        <div className="flex justify-center items-center gap-4 flex-wrap">
+          {section.socials.map((social) => (
+            <a
+              key={social.name}
+              href={social.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/25 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {social.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return <p>{section.content}</p>;
+};
+
+// ===== COMPONENT =====
+
+interface ScrollableContentProps {
+  className?: string;
+  onSectionChange: (id: string) => void;
+  activeSection: string;
+}
+
+const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSectionChange, activeSection }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);
   const activeIndexRef = useRef(0);
@@ -117,10 +304,8 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
         let stt;
         if (i > activeIndexRef.current) {
           stt = i - activeIndexRef.current;
-          // Use a more gradual scaling factor
           let scale = 1 - 0.15 * stt;
-          scale = Math.max(0, scale); // Ensure scale is not negative
-          // Use rem for translateY to be independent of viewport height
+          scale = Math.max(0, scale);
           transform = `translateY(${stt * 8}rem) scale(${scale}) perspective(16px)`;
           zIndex = -stt;
           filter = `blur(${stt}px)`;
@@ -152,14 +337,14 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
   }, [onSectionChange]);
 
   useEffect(() => {
-    const componentRoot = document.querySelector<HTMLElement>(`.${className?.split(' ')[0]}`);
+    const componentRoot = containerRef.current;
     const slider = sliderRef.current;
     const items = itemsRef.current;
 
     if (!slider || !items.length || !componentRoot) return;
 
     const observer = Observer.create({
-      target: window, // Escuchar en toda la ventana
+      target: window,
       type: "wheel,touch,pointer",
       preventDefault: true,
       onDown: () => goToSlide(activeIndexRef.current - 1),
@@ -199,11 +384,11 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
       componentRoot.removeEventListener('mousemove', handleMouseMove);
       componentRoot.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [goToSlide, className]);
+  }, [goToSlide]);
 
   useEffect(() => {
     goToSlide(0, 0);
-  }, []); // Se ejecuta solo una vez al montar el componente
+  }, [goToSlide]);
 
   useEffect(() => {
     const targetIndex = sections.findIndex(s => s.id === activeSection);
@@ -226,7 +411,7 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
   };
 
   return (
-    <div className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
+    <div ref={containerRef} className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
       <div className="relative">
         <div
           ref={sliderRef}
@@ -239,7 +424,7 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
           {sections.map((section, index) => (
             <div
               key={section.id}
-              ref={el => { itemsRef.current[index] = el! }}
+              ref={el => { if (el) itemsRef.current[index] = el; }}
               className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-8 sm:pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[8px] overflow-y-auto"
             >
               {section.id === 'home' && (
@@ -252,105 +437,18 @@ const ScrollableContent: React.FC<{ className?: string, onSectionChange: (id: st
               <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-4 flex-shrink-0">{section.title}</h2>
 
               <div className="w-full text-base sm:text-lg text-white/80 text-center flex-grow overflow-y-auto px-2">
-                {(section as any).education ? (
-                  <div>
-                    <ul className="space-y-4">
-                      {(section as any).education.map((edu: any, index: number) => (
-                        <li key={index}>
-                          <p className="font-semibold text-white">{edu.title}</p>
-                          <p className="text-base sm:text-lg text-white/70">{edu.institution}</p>
-                          <p className="text-sm text-white/50">{edu.date}</p>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-6">
-                      <h3 className="font-bold text-white text-lg sm:text-xl mb-2">Languages</h3>
-                      <ul className="space-y-2 text-base sm:text-lg">
-                        {(section as any).languages.map((lang: any, index: number) => (
-                          <li key={index} className="flex justify-center space-x-2">
-                            <span>{lang.lang}:</span>
-                            <span className="font-semibold">{lang.level}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ) : (section as any).skills ? (
-                  <div className="w-full">
-                    {Object.entries((section as any).skills).map(([category, skillsList]) => (
-                      <div key={category} className="mb-4">
-                        <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-3">{category}</h3>
-                        <div className="flex flex-wrap justify-center gap-2">
-                          {(skillsList as string[]).map((skill) => (
-                            <span key={skill} className="bg-white/10 text-white px-3 py-1 rounded-full text-sm">
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (section as any).projects ? (
-                  <div className="w-full">
-                    {(section as any).projects.map((project: any, index: number) => (
-                      <div key={index} className="mb-6 last:mb-0">
-                        <h3 className="font-bold text-white text-center text-lg sm:text-xl mb-2">{project.title}</h3>
-                        <p className="text-center text-base sm:text-lg mb-3">{project.description}</p>
-                        {project.livePreviewUrl && (
-                          <div className="text-center mt-4">
-                            <a
-                              href={project.livePreviewUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-block px-6 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Live Preview
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (section as any).socials ? (
-                  <div className="w-full">
-                    <p className="mb-4">
-                      <a href={`mailto:${(section as any).email}`} className="hover:text-white transition-colors">
-                        {(section as any).email}
-                      </a>
-                    </p>
-                    <p className="mb-6">
-                      {(section as any).phone}
-                    </p>
-                    <div className="flex justify-center items-center gap-4 flex-wrap">
-                      {(section as any).socials.map((social: any) => (
-                        <a
-                          key={social.name}
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/25 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {social.name}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p>{section.content}</p>
-                )}
+                {renderSectionContent(section)}
               </div>
 
-              {'downloadLink' in section && (
+              {section.id === 'cv' && (
                 <div className="mt-auto pt-4 flex-shrink-0">
                   <a
-                    href={(section as any).downloadLink}
+                    href={section.downloadLink}
                     download
                     className="mt-6 px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg border border-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-base sm:text-lg"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    📥 Download CV
+                    Download CV
                   </a>
                 </div>
               )}

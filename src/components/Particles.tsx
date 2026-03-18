@@ -23,15 +23,20 @@ const fragmentShader = `
   }
 `;
 
+// Constant defined outside component — never changes
+const PARTICLE_COUNT = 5000;
+
 const Particles: React.FC = () => {
   const pointsRef = useRef<THREE.Points>(null);
   const mouse = useRef(new THREE.Vector2());
 
-  const count = 5000;
+  // Pre-allocated temp vectors to avoid per-frame garbage collection
+  const tempVec = useRef(new THREE.Vector3());
+  const cameraDir = useRef(new THREE.Vector3());
 
   const particles = useMemo(() => {
     const temp = [];
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
       temp.push({
         position: new THREE.Vector3(),
         velocity: new THREE.Vector3(),
@@ -40,11 +45,11 @@ const Particles: React.FC = () => {
       });
     }
     return temp;
-  }, [count]);
+  }, []);
 
-  const positions = useMemo(() => new Float32Array(count * 3), [count]);
-  const ages = useMemo(() => new Float32Array(count), [count]);
-  const lifespans = useMemo(() => new Float32Array(count), [count]);
+  const positions = useMemo(() => new Float32Array(PARTICLE_COUNT * 3), []);
+  const ages = useMemo(() => new Float32Array(PARTICLE_COUNT), []);
+  const lifespans = useMemo(() => new Float32Array(PARTICLE_COUNT), []);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -59,35 +64,38 @@ const Particles: React.FC = () => {
     };
   }, []);
 
-  const { camera, raycaster } = useThree();
+  const { raycaster } = useThree();
   const plane = useMemo(() => new THREE.Plane(), []);
   const target = useMemo(() => new THREE.Vector3(), []);
 
   useFrame((state, delta) => {
-    const { camera } = state;
     if (pointsRef.current) {
-      // Update the plane to be in front of the camera
-      plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(plane.normal), camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(5)));
+      // Reuse pre-allocated vectors — no garbage per frame
+      state.camera.getWorldDirection(cameraDir.current);
+      tempVec.current.copy(state.camera.position).addScaledVector(cameraDir.current, 5);
+      plane.setFromNormalAndCoplanarPoint(cameraDir.current, tempVec.current);
 
-      raycaster.setFromCamera(mouse.current, camera);
+      raycaster.setFromCamera(mouse.current, state.camera);
       raycaster.ray.intersectPlane(plane, target);
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
         const particle = particles[i];
         particle.age += delta;
 
         if (particle.age > particle.lifespan) {
           particle.age = 0;
           particle.position.copy(target);
-          const speed = Math.random() * 1 + 0.5; // Slower speed
+          const speed = Math.random() * 1 + 0.5;
           particle.velocity.set(
             (Math.random() - 0.5) * 0.5,
-            speed, // Move upwards
+            speed,
             (Math.random() - 0.5) * 0.5
           );
         }
 
-        particle.position.add(particle.velocity.clone().multiplyScalar(delta));
+        // Reuse tempVec to avoid allocating a new Vector3 per particle per frame
+        tempVec.current.copy(particle.velocity).multiplyScalar(delta);
+        particle.position.add(tempVec.current);
 
         const i3 = i * 3;
         positions[i3] = particle.position.x;
@@ -132,7 +140,7 @@ const Particles: React.FC = () => {
         transparent
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        depthTest={false} // Disable depth testing
+        depthTest={false}
       />
     </points>
   );
