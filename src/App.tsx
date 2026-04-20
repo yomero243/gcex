@@ -1,13 +1,11 @@
 import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Experience from './components/Experience';
-import Buttons from './components/Buttons';
 
 import ScrollableContent from './components/ScrollableContent';
 import { LoadingScreen } from './components/LoadingScreen';
 
 function App() {
-  const [isMenuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [started, setStarted] = useState(false);
 
@@ -26,14 +24,7 @@ function App() {
             <h1 className="text-2xl sm:text-4xl font-bold text-white" style={{ textShadow: '0 0 10px #FFD700' }}>My 3D Portfolio</h1>
             <p className="text-yellow-200/80">Made with R3F and Tailwind</p>
           </div>
-          <button
-            onClick={() => setMenuOpen(!isMenuOpen)}
-            className="z-20 p-2 text-white bg-black/20 rounded-md hover:bg-white/20 hover:text-black transition-colors shadow-lg pointer-events-auto"
-          >
-            {isMenuOpen ? 'Close' : 'Menu'}
-          </button>
         </div>
-        <Buttons isOpen={isMenuOpen} activeSection={activeSection} onNavigate={handleNavigation} />
       </div>
 
       {/* Container for the 3D Canvas */}

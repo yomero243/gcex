@@ -57,10 +57,22 @@ const Particles: React.FC = () => {
       mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
     };
 
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        mouse.current.x = (touch.clientX / window.innerWidth) * 2 - 1;
+        mouse.current.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchMove, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchstart', handleTouchMove);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
@@ -119,18 +131,21 @@ const Particles: React.FC = () => {
           count={positions.length / 3}
           array={positions}
           itemSize={3}
+          args={[positions, 3]}
         />
         <bufferAttribute
           attach="attributes-age"
           count={ages.length}
           array={ages}
           itemSize={1}
+          args={[ages, 1]}
         />
         <bufferAttribute
           attach="attributes-lifespan"
           count={lifespans.length}
           array={lifespans}
           itemSize={1}
+          args={[lifespans, 1]}
         />
       </bufferGeometry>
       <shaderMaterial
