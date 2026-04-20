@@ -63,24 +63,24 @@ const lightAnimationConfig = {
     oscillationSpeed: 0.3,              // Velocidad de oscilación en el eje X
     xAmplitude: 1,                      // Amplitud de movimiento en X
     zAmplitude: 0.5,                    // Amplitud de movimiento en Z
-    intensityBase: 1.2,                 // Intensidad base de la luz
+    intensityBase: 0.8,                 // Intensidad base de la luz (reducida para ser más sutil)
     intensitySpeed: 1.5,                // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.2,            // Amplitud de variación de intensidad
+    intensityAmplitude: 0.1,            // Amplitud de variación de intensidad
   },
   // Luz de relleno (Fill Light) - Suaviza las sombras duras de la luz principal
   fillLight: {
-    intensityBase: 0.4,                 // Intensidad base (más suave que la key light)
+    intensityBase: 0.3,                 // Intensidad base (más suave que la key light)
     intensitySpeed: 0.8,                // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.1,            // Variación sutil de intensidad
+    intensityAmplitude: 0.05,           // Variación sutil de intensidad
   },
   // Luz de contorno (Rim Light) - Crea un halo de luz alrededor del objeto
   rimLight: {
     baseX: -4,                          // Posición base en X (lado opuesto)
     oscillationSpeed: 0.4,              // Velocidad de movimiento horizontal
     xAmplitude: 0.5,                    // Amplitud de movimiento en X
-    intensityBase: 0.8,                 // Intensidad base
+    intensityBase: 0.5,                 // Intensidad base (reducida)
     intensitySpeed: 2,                  // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.3,            // Variación de intensidad
+    intensityAmplitude: 0.2,            // Variación de intensidad
   },
 };
 
@@ -139,7 +139,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={keyLightRef}
         position={[3, 4, 5]}              // X: 3 (derecha), Y: 4 (altura media), Z: 5 (delante)
-        intensity={2.5}                   // Intensidad: 2.5 (luz principal, más fuerte)
+        intensity={1.2}                   // Intensidad reducida para ser más sutil
         color="#FFD700"                   // Color: Amarillo dorado
         castShadow                        // Propiedad: Proyecta sombras
         shadow-mapSize-width={1024}       // Propiedad: Resolución de sombras (ancho)
@@ -150,7 +150,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={fillLightRef}
         position={[-2, 2, 3]}             // X: -2 (izquierda), Y: 2 (altura baja), Z: 3 (delante)
-        intensity={1.5}                   // Intensidad: 1.5 (más suave que la key light)
+        intensity={0.6}                   // Intensidad reducida
         color="#FFFFE0"                   // Color: Amarillo claro
       />
       
@@ -158,7 +158,7 @@ const LightsComponent: React.FC = () => {
       <directionalLight 
         ref={rimLightRef}
         position={[-4, 3, -2]}            // X: -4 (izquierda), Y: 3 (altura media), Z: -2 (atrás)
-        intensity={2.0}                   // Intensidad: 2.0 (fuerte para crear contraste)
+        intensity={0.8}                   // Intensidad reducida
         color="#FFD700"                   // Color: Amarillo dorado
       />
       
@@ -168,7 +168,7 @@ const LightsComponent: React.FC = () => {
      
       {/* Luz hemisférica - Crea gradiente de color en sombras */}
       <hemisphereLight 
-        args={["#FFD700", "#FFFFE0", 0.6]} // Color arriba: Amarillo dorado, Color abajo: Amarillo claro, Intensidad: 0.6
+        args={["#FFD700", "#FFFFE0", 0.4]} // Intensidad reducida a 0.4
       />
 
       {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (LUCES DIRECCIONALES POR SECCIÓN) ===== */}

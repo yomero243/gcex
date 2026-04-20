@@ -276,7 +276,7 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
   const activeIndexRef = useRef(0);
   const isAnimatingRef = useRef(false);
 
-  const goToSlide = useCallback((newIndex: number, duration = 0.8) => {
+  const goToSlide = useCallback((newIndex: number, duration = 1.0) => {
     const items = itemsRef.current;
     const totalItems = items.length;
     newIndex = gsap.utils.clamp(0, totalItems - 1, newIndex);
@@ -308,13 +308,13 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
           scale = Math.max(0, scale);
           transform = `translateY(${stt * 8}rem) scale(${scale}) perspective(16px)`;
           zIndex = -stt;
-          filter = `blur(${stt}px)`;
+          filter = `blur(${stt * 0.5}px)`;
           opacity = stt > 2 ? 0 : 0.4;
         } else {
           stt = activeIndexRef.current - i;
           transform = `translateY(0) scale(${1 - 0.05 * stt}) perspective(16px)`;
           zIndex = -stt;
-          filter = 'blur(5px)';
+          filter = 'blur(2px)';
           opacity = 0;
         }
       }
@@ -326,7 +326,7 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
         opacity,
         visibility,
         duration,
-        ease: "power3.inOut",
+        ease: "power2.out",
         onComplete: () => {
           if (i === totalItems - 1) {
             isAnimatingRef.current = false;
@@ -347,6 +347,7 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
       target: window,
       type: "wheel,touch,pointer",
       preventDefault: true,
+      tolerance: 15,
       onDown: () => goToSlide(activeIndexRef.current - 1),
       onUp: () => goToSlide(activeIndexRef.current + 1)
     });
@@ -412,7 +413,8 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
 
   return (
     <div ref={containerRef} className={`${className} fixed inset-0 grid place-items-center pointer-events-auto`}>
-      <div className="relative">
+      <div className="relative flex flex-col md:flex-row items-center">
+        {/* Main Content Slider */}
         <div
           ref={sliderRef}
           className={`
@@ -425,7 +427,7 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
             <div
               key={section.id}
               ref={el => { if (el) itemsRef.current[index] = el; }}
-              className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-8 sm:pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[8px] overflow-y-auto"
+              className="item absolute top-0 left-0 w-full h-full flex flex-col items-center justify-start text-white opacity-0 pt-8 sm:pt-12 pb-6 px-4 sm:px-6 md:px-8 rounded-[15px] sm:rounded-[20px] md:rounded-[25px] border border-white/15 backdrop-blur-[4px] overflow-y-auto"
             >
               {section.id === 'home' && (
                 <img
@@ -455,6 +457,49 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
             </div>
           ))}
         </div>
+
+        {/* Scroll Progress Bar (Responsive Dots) */}
+        <div className="mt-8 md:mt-0 md:ml-10 flex flex-row md:flex-col items-center justify-center gap-6 py-4 px-6 md:py-10 md:px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md z-30 pointer-events-auto shadow-2xl">
+          {sections.map((section, index) => (
+            <button
+              key={`dot-${section.id}`}
+              onClick={() => goToSlide(index)}
+              className="group relative flex items-center justify-center transition-transform duration-300 active:scale-90"
+              aria-label={`Go to ${section.title}`}
+            >
+              {/* Dot */}
+              <div
+                className={`
+                  w-2 h-2 rounded-full transition-all duration-500
+                  ${activeSection === section.id 
+                    ? 'bg-white scale-[1.8] shadow-[0_0_15px_rgba(255,255,255,0.8)]' 
+                    : 'bg-white/20 group-hover:bg-white/80 group-hover:scale-150'}
+                `}
+              />
+              
+              {/* Label (Visible on hover) */}
+              <span className="absolute bottom-full mb-4 md:bottom-auto md:right-full md:mr-6 px-3 py-1.5 rounded-lg bg-black/80 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 translate-y-2 md:translate-y-0 md:translate-x-4 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 pointer-events-none border border-white/20 backdrop-blur-md shadow-xl">
+                {section.title}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll Hint Indicator */}
+      <div 
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/80 pointer-events-none transition-all duration-700 ${activeSection === sections[0].id ? 'opacity-100' : 'opacity-0 translate-y-4'}`}
+        style={{ animation: activeSection === sections[0].id ? 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none' }}
+      >
+        <span className="text-[11px] uppercase tracking-[0.5em] font-black drop-shadow-lg">Scroll</span>
+        <svg 
+          className="w-6 h-6 drop-shadow-lg" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
       </div>
     </div>
   );
