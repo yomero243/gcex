@@ -2,38 +2,15 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const vertexShader = `
-  attribute float age;
-  attribute float lifespan;
-  varying float vAge;
-  void main() {
-    vAge = age / lifespan;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = (1.0 - vAge) * 10.0;
-  }
-`;
-
-const fragmentShader = `
-  varying float vAge;
-  void main() {
-    vec3 color1 = vec3(1.0, 0.8, 0.2); // Yellow
-    vec3 color2 = vec3(1.0, 0.2, 0.0); // Red
-    vec3 finalColor = mix(color1, color2, vAge);
-    gl_FragColor = vec4(finalColor, 1.0 - vAge);
-  }
-`;
-
-// Constant defined outside component — never changes
-const PARTICLE_COUNT = 5000;
+const PARTICLE_COUNT = 4000;
 
 const Particles: React.FC = () => {
-  const pointsRef = useRef<THREE.Points>(null);
+  const meshRef = useRef<THREE.InstancedMesh>(null!);
   const mouse = useRef(new THREE.Vector2());
-
-  // Pre-allocated temp vectors to avoid per-frame garbage collection
-  const tempVec = useRef(new THREE.Vector3());
-  const cameraDir = useRef(new THREE.Vector3());
-
+  const tempObject = useMemo(() => new THREE.Object3D(), []);
+  const tempColor = useMemo(() => new THREE.Color(), []);
+  
+  // State for particles logic
   const particles = useMemo(() => {
     const temp = [];
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -41,123 +18,89 @@ const Particles: React.FC = () => {
         position: new THREE.Vector3(),
         velocity: new THREE.Vector3(),
         age: 0,
-        lifespan: Math.random() * 2 + 1, // 1 to 3 seconds
+        lifespan: Math.random() * 2 + 1,
       });
     }
     return temp;
   }, []);
 
-  const positions = useMemo(() => new Float32Array(PARTICLE_COUNT * 3), []);
-  const ages = useMemo(() => new Float32Array(PARTICLE_COUNT), []);
-  const lifespans = useMemo(() => new Float32Array(PARTICLE_COUNT), []);
-
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    const handleMove = (x: number, y: number) => {
+      mouse.current.x = (x / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(y / window.innerHeight) * 2 + 1;
     };
 
-    const handleTouchMove = (event: TouchEvent) => {
-      if (event.touches.length > 0) {
-        const touch = event.touches[0];
-        mouse.current.x = (touch.clientX / window.innerWidth) * 2 - 1;
-        mouse.current.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-      }
+    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('touchstart', handleTouchMove, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchstart', handleTouchMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
+
+    function handleTouchMove(e: TouchEvent) {
+        if (e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
   }, []);
 
   const { raycaster } = useThree();
   const plane = useMemo(() => new THREE.Plane(), []);
   const target = useMemo(() => new THREE.Vector3(), []);
+  const cameraDir = useMemo(() => new THREE.Vector3(), []);
 
   useFrame((state, delta) => {
-    if (pointsRef.current) {
-      // Reuse pre-allocated vectors — no garbage per frame
-      state.camera.getWorldDirection(cameraDir.current);
-      tempVec.current.copy(state.camera.position).addScaledVector(cameraDir.current, 5);
-      plane.setFromNormalAndCoplanarPoint(cameraDir.current, tempVec.current);
+    if (!meshRef.current) return;
 
-      raycaster.setFromCamera(mouse.current, state.camera);
-      raycaster.ray.intersectPlane(plane, target);
+    state.camera.getWorldDirection(cameraDir);
+    plane.setFromNormalAndCoplanarPoint(cameraDir, new THREE.Vector3().copy(state.camera.position).addScaledVector(cameraDir, 5));
+    raycaster.setFromCamera(mouse.current, state.camera);
+    raycaster.ray.intersectPlane(plane, target);
 
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const particle = particles[i];
-        particle.age += delta;
+    particles.forEach((particle, i) => {
+      particle.age += delta;
 
-        if (particle.age > particle.lifespan) {
-          particle.age = 0;
-          particle.position.copy(target);
-          const speed = Math.random() * 1 + 0.5;
-          particle.velocity.set(
-            (Math.random() - 0.5) * 0.5,
-            speed,
-            (Math.random() - 0.5) * 0.5
-          );
-        }
-
-        // Reuse tempVec to avoid allocating a new Vector3 per particle per frame
-        tempVec.current.copy(particle.velocity).multiplyScalar(delta);
-        particle.position.add(tempVec.current);
-
-        const i3 = i * 3;
-        positions[i3] = particle.position.x;
-        positions[i3 + 1] = particle.position.y;
-        positions[i3 + 2] = particle.position.z;
-
-        ages[i] = particle.age;
-        lifespans[i] = particle.lifespan;
+      if (particle.age > particle.lifespan) {
+        particle.age = 0;
+        particle.position.copy(target);
+        particle.velocity.set(
+          (Math.random() - 0.5) * 0.5,
+          Math.random() * 1 + 0.5,
+          (Math.random() - 0.5) * 0.5
+        );
       }
 
-      pointsRef.current.geometry.attributes.position.needsUpdate = true;
-      pointsRef.current.geometry.attributes.age.needsUpdate = true;
-    }
+      particle.position.addScaledVector(particle.velocity, delta);
+
+      // Update instance matrix
+      const scale = (1.0 - particle.age / particle.lifespan) * 0.05; // Base scale 0.05 world units
+      tempObject.position.copy(particle.position);
+      tempObject.scale.setScalar(scale);
+      tempObject.updateMatrix();
+      meshRef.current.setMatrixAt(i, tempObject.matrix);
+
+      // Update instance color
+      const t = particle.age / particle.lifespan;
+      // Interpolate between Yellow and Red
+      tempColor.setRGB(1.0, 0.8 - t * 0.6, 0.2 - t * 0.2);
+      meshRef.current.setColorAt(i, tempColor);
+    });
+
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
   });
 
   return (
-    <points ref={pointsRef} frustumCulled={false}>
-      <bufferGeometry attach="geometry">
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-          args={[positions, 3]}
-        />
-        <bufferAttribute
-          attach="attributes-age"
-          count={ages.length}
-          array={ages}
-          itemSize={1}
-          args={[ages, 1]}
-        />
-        <bufferAttribute
-          attach="attributes-lifespan"
-          count={lifespans.length}
-          array={lifespans}
-          itemSize={1}
-          args={[lifespans, 1]}
-        />
-      </bufferGeometry>
-      <shaderMaterial
-        attach="material"
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        transparent
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        depthTest={false}
-      />
-    </points>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, PARTICLE_COUNT]} frustumCulled={false}>
+      <circleGeometry args={[1, 8]} />
+      <meshBasicMaterial transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </instancedMesh>
   );
 };
 

@@ -459,11 +459,30 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
         </div>
 
         {/* Scroll Progress Bar (Responsive Dots) */}
-        <div className="mt-8 md:mt-0 md:ml-10 flex flex-row md:flex-col items-center justify-center gap-6 py-4 px-6 md:py-10 md:px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md z-30 pointer-events-auto shadow-2xl transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+        <div 
+          className="mt-8 md:mt-0 md:ml-10 flex flex-row md:flex-col items-center justify-center gap-6 py-4 px-6 md:py-10 md:px-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md z-30 pointer-events-auto shadow-2xl transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => {
+            e.stopPropagation();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            const button = target?.closest('button[data-index]');
+            if (button) {
+              const index = parseInt(button.getAttribute('data-index') || '0', 10);
+              // Solo activar si es a partir de la segunda bolita (índice 1+)
+              // Eliminamos el bloqueo de isAnimating solo para el gesto táctil directo en la barra para máxima fluidez
+              if (index >= 1 && index !== activeIndexRef.current) {
+                goToSlide(index, 0.6); // Duración más corta para el "slide" táctil
+              }
+            }
+          }}
+        >
           {sections.map((section, index) => (
             <button
               key={`dot-${section.id}`}
+              data-index={index}
               onClick={() => goToSlide(index)}
+              onPointerDown={(e) => e.stopPropagation()}
               className="group relative flex items-center justify-center transition-all duration-200 active:scale-90"
               aria-label={`Go to ${section.title}`}
             >
@@ -478,7 +497,7 @@ const ScrollableContent: React.FC<ScrollableContentProps> = ({ className, onSect
               />
               
               {/* Liquid Label */}
-              <span className="absolute bottom-full mb-4 md:bottom-auto md:left-full md:ml-6 px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-y-2 md:translate-y-0 md:-translate-x-4 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 pointer-events-none border border-white/20 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
+              <span className="absolute bottom-full mb-4 md:bottom-auto md:left-full md:ml-6 px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-y-2 md:translate-y-0 md:translate-x-4 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 pointer-events-none border border-white/20 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
                 {section.title}
               </span>
             </button>
