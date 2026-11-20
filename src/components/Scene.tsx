@@ -1,224 +1,222 @@
 /* eslint-disable react/no-unknown-property */
-import React, { useEffect, useRef } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
-import { 
-  useGLTF,
-  PerspectiveCamera
-} from '@react-three/drei';
+import React, { Suspense, useEffect, useRef } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Environment, Lightformer, PerspectiveCamera, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
-import gsap from "gsap";
-
-
+import { scrollStore, getInterpolatedWaypoint } from '../utils/scrollStore';
 import Particles from './Particles';
+import RunnerCharacter from './RunnerCharacter';
 
-// Interfaces
-interface CameraNavigationEvent extends Event {
-  detail: {
-    section: string;
-  };
-}
-
-interface CameraPosition {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface CameraPositions {
-  [key: string]: CameraPosition;
-}
-
-// Componente para el Modelo de Entorno
 const EnvironmentModel: React.FC = () => {
-  const { scene } = useGLTF('/variosuvs3.glb');
-  
-  // Asegurar que el modelo se renderice correctamente
+  const { scene } = useGLTF('/variosuvs3-opt.glb');
+  const { gl } = useThree();
+
   useEffect(() => {
+    let maxAnisotropy = 1;
+    try {
+      maxAnisotropy = Math.min(gl?.capabilities?.getMaxAnisotropy?.() ?? 1, 8);
+    } catch {
+      maxAnisotropy = 1;
+    }
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+        // Cycles lighting & shadows are already baked into the combined texture —
+        // disabling real-time self-shadowing avoids frustum cutoff triangles and shadow acne.
+        child.castShadow = false;
+        child.receiveShadow = false;
+
+        const materials = Array.isArray(child.material) ? child.material : [child.material];
+        for (const rawMat of materials) {
+          if (!rawMat || !(rawMat instanceof THREE.MeshStandardMaterial)) continue;
+
+          rawMat.envMapIntensity = 0.45;
+          rawMat.dithering = true;
+          if (rawMat.normalScale) {
+            rawMat.normalScale.set(0.65, 0.65);
+          }
+
+          const textures = [
+            rawMat.map,
+            rawMat.normalMap,
+            rawMat.roughnessMap,
+            rawMat.metalnessMap,
+            rawMat.aoMap,
+          ];
+          for (const tex of textures) {
+            if (tex) {
+              tex.anisotropy = maxAnisotropy;
+              tex.needsUpdate = true;
+            }
+          }
+          rawMat.needsUpdate = true;
+        }
       }
     });
-  }, [scene]);
-  
+  }, [scene, gl]);
+
+  return <primitive object={scene} scale={1} position={[-1.5, 1, 0]} rotation={[0, 0, 0]} />;
+};
+
+useGLTF.preload('/variosuvs3-opt.glb');
+
+// Procedural IBL lightformers (zero external HDR fetch)
+const ProceduralIBL: React.FC = () => {
   return (
-    <primitive 
-      object={scene} 
-      scale={1} 
-      position={[-1.5, 1, 0]} 
-      rotation={[0, 0, 0]}
-    />
+    <Environment resolution={256} frames={1}>
+      {/* Overhead cool architectural strip */}
+      <Lightformer
+        form="rect"
+        intensity={1.6}
+        color="#8da8f8"
+        position={[0, 10, -18]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[6, 40, 1]}
+      />
+      {/* Warm tungsten bounce accent */}
+      <Lightformer
+        form="rect"
+        intensity={2.2}
+        color="#f5b971"
+        position={[8, 4, -8]}
+        rotation={[0, -Math.PI / 2, 0]}
+        scale={[14, 3, 1]}
+      />
+      {/* Deep indigo rim light */}
+      <Lightformer
+        form="rect"
+        intensity={1.2}
+        color="#6366f1"
+        position={[-8, 3, -24]}
+        rotation={[0, Math.PI / 2, 0]}
+        scale={[18, 2.5, 1]}
+      />
+    </Environment>
   );
 };
 
-useGLTF.preload('/variosuvs3.glb');
+interface CorridorBayLight {
+  position: [number, number, number];
+  maxIntensity: number;
+  distance: number;
+  color: string;
+  triggerAt: number; // scroll progress (0..5) where this bay's motion sensor switches ON
+}
 
-// Configuración para la animación de las luces principales que iluminan el modelo 3D
-// Estas luces crean un efecto cinematográfico con movimiento dinámico
-const lightAnimationConfig = {
-  // Luz principal (Key Light) - La luz más importante que define la forma del objeto
-  keyLight: {
-    baseX: 3, y: 4, baseZ: 5,           // Posición base de la luz
-    oscillationSpeed: 0.3,              // Velocidad de oscilación en el eje X
-    xAmplitude: 1,                      // Amplitud de movimiento en X
-    zAmplitude: 0.5,                    // Amplitud de movimiento en Z
-    intensityBase: 0.8,                 // Intensidad base de la luz (reducida para ser más sutil)
-    intensitySpeed: 1.5,                // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.1,            // Amplitud de variación de intensidad
-  },
-  // Luz de relleno (Fill Light) - Suaviza las sombras duras de la luz principal
-  fillLight: {
-    intensityBase: 0.3,                 // Intensidad base (más suave que la key light)
-    intensitySpeed: 0.8,                // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.05,           // Variación sutil de intensidad
-  },
-  // Luz de contorno (Rim Light) - Crea un halo de luz alrededor del objeto
-  rimLight: {
-    baseX: -4,                          // Posición base en X (lado opuesto)
-    oscillationSpeed: 0.4,              // Velocidad de movimiento horizontal
-    xAmplitude: 0.5,                    // Amplitud de movimiento en X
-    intensityBase: 0.5,                 // Intensidad base (reducida)
-    intensitySpeed: 2,                  // Velocidad de cambio de intensidad
-    intensityAmplitude: 0.2,            // Variación de intensidad
-  },
-};
+// Motion-sensor corridor bay lights: each bay starts OFF in the dark ahead and clicks ON
+// sequentially as the camera advances through the hallway (and turns OFF when retreating).
+const CORRIDOR_BAYS: CorridorBayLight[] = [
+  { position: [1.4, 4.9, -1.5], maxIntensity: 28, distance: 20, color: '#f5a962', triggerAt: -1.0 },
+  { position: [-0.6, 4.7, -10.5], maxIntensity: 68, distance: 24, color: '#ffcb91', triggerAt: 0.45 },
+  { position: [1.0, 5.0, -22.5], maxIntensity: 82, distance: 28, color: '#dbeafe', triggerAt: 1.4 },
+  { position: [-0.5, 4.9, -35.0], maxIntensity: 88, distance: 28, color: '#ffc88a', triggerAt: 2.35 },
+  { position: [0.8, 4.8, -47.0], maxIntensity: 92, distance: 30, color: '#bae6fd', triggerAt: 3.35 },
+  { position: [-0.3, 4.6, -55.0], maxIntensity: 96, distance: 30, color: '#ffd29d', triggerAt: 4.25 },
+  { position: [0.4, 4.3, -60.5], maxIntensity: 112, distance: 34, color: '#ffe3bd', triggerAt: 4.55 },
+];
 
-// Componente principal que maneja todas las luces de la escena
-// Incluye luces animadas para el modelo 3D y luces estáticas para el pasillo
 const LightsComponent: React.FC = () => {
-  // Referencias para las luces animadas del modelo 3D (sistema de iluminación cinematográfica)
-  const keyLightRef = useRef<THREE.DirectionalLight>(null);    // Luz principal
-  const fillLightRef = useRef<THREE.DirectionalLight>(null);   // Luz de relleno
-  const rimLightRef = useRef<THREE.DirectionalLight>(null);    // Luz de contorno
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const hemiRef = useRef<THREE.HemisphereLight>(null);
+  const keyLightRef = useRef<THREE.DirectionalLight>(null);
+  const bayRefs = useRef<(THREE.PointLight | null)[]>([]);
+  // Track discrete ON/OFF latch with hysteresis per bay + smoothly damped current brightness
+  const bayStateRef = useRef<boolean[]>(CORRIDOR_BAYS.map((_, idx) => idx === 0));
+  const bayLevelsRef = useRef<number[]>(CORRIDOR_BAYS.map((_, idx) => (idx === 0 ? 1 : 0)));
+  const simTimeRef = useRef(0);
 
-  // Referencias para las luces direccionales del pasillo (uno por cada sección de navegación)
-  const hallwaySpotlight1 = useRef<THREE.DirectionalLight>(null!);    // Sección: Inicio
-  const hallwaySpotlight2 = useRef<THREE.DirectionalLight>(null!);    // Sección: Sobre mí
-  const hallwaySpotlight3 = useRef<THREE.DirectionalLight>(null!);    // Sección: Proyectos
-  const hallwaySpotlight4 = useRef<THREE.DirectionalLight>(null!);    // Sección: Habilidades
-  const hallwaySpotlight5 = useRef<THREE.DirectionalLight>(null!);    // Sección: Contacto
+  useFrame((state, delta) => {
+    const dt = Math.min(Math.max(delta, 0.0001), 0.05);
+    if (!scrollStore.motionPaused) {
+      simTimeRef.current += dt;
+    }
+    const t = simTimeRef.current;
+    const p = scrollStore.currentProgress;
 
-  // Helpers visuales removidos para una vista más limpia
+    // Sequentially latch each corridor bay light ON as you pass its motion sensor
+    let activeSum = 0;
+    const latched = bayStateRef.current;
+    const levels = bayLevelsRef.current;
 
+    for (let i = 0; i < CORRIDOR_BAYS.length; i++) {
+      const bay = CORRIDOR_BAYS[i];
+      if (i === 0) {
+        latched[i] = true;
+      } else if (!latched[i] && p >= bay.triggerAt) {
+        latched[i] = true;
+      } else if (latched[i] && p < bay.triggerAt - 0.12) {
+        latched[i] = false;
+      }
 
-  // Hook que se ejecuta en cada frame para animar las luces del modelo 3D
-  // Crea un efecto cinematográfico con luces que se mueven y cambian de intensidad
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime(); // Tiempo transcurrido desde el inicio
-    const { keyLight, fillLight, rimLight } = lightAnimationConfig;
-    
-    // Animación de la luz principal (Key Light)
-    // Se mueve en un patrón circular y varía su intensidad para crear dinamismo
+      const targetLevel = latched[i] ? 1 : 0;
+      // Snappy ~200ms relay switch-on, slightly gentler fade-out when backing away
+      const lambda = targetLevel > levels[i] ? 13.0 : 7.0;
+      levels[i] += (targetLevel - levels[i]) * (1 - Math.exp(-lambda * dt));
+      if (Math.abs(targetLevel - levels[i]) < 0.001) {
+        levels[i] = targetLevel;
+      }
+      activeSum += levels[i];
+
+      const light = bayRefs.current[i];
+      if (light) {
+        const subtleBreath =
+          !scrollStore.motionPaused && levels[i] > 0.9
+            ? Math.sin(t * (1.1 + i * 0.17) + i) * 1.6
+            : 0;
+        light.intensity = Math.max(0, bay.maxIntensity * levels[i] + subtleBreath);
+      }
+    }
+
+    // Bounced global light & fog clarity rise naturally with how many bays are switched ON
+    const litRatio = Math.max(0, Math.min(1, (activeSum - 1) / (CORRIDOR_BAYS.length - 1)));
+
+    if (ambientRef.current) {
+      ambientRef.current.intensity = 0.14 + litRatio * 0.44;
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = 0.2 + litRatio * 0.52;
+    }
     if (keyLightRef.current) {
-      keyLightRef.current.position.x = keyLight.baseX + Math.sin(time * keyLight.oscillationSpeed) * keyLight.xAmplitude;
-      keyLightRef.current.position.y = keyLight.y; // Altura fija
-      keyLightRef.current.position.z = keyLight.baseZ + Math.cos(time * keyLight.oscillationSpeed) * keyLight.zAmplitude;
-      keyLightRef.current.intensity = keyLight.intensityBase + Math.sin(time * keyLight.intensitySpeed) * keyLight.intensityAmplitude;
-    }
-    
-    // Animación de la luz de relleno (Fill Light)
-    // Solo varía la intensidad para suavizar las sombras de manera sutil
-    if (fillLightRef.current) {
-      fillLightRef.current.intensity = fillLight.intensityBase + Math.sin(time * fillLight.intensitySpeed) * fillLight.intensityAmplitude;
+      const pulse = scrollStore.motionPaused ? 0 : Math.sin(t * 0.7) * 0.06;
+      keyLightRef.current.intensity = 0.5 + litRatio * 0.8 + pulse;
     }
 
-    // Animación de la luz de contorno (Rim Light)
-    // Se mueve horizontalmente y cambia intensidad para crear siluetas dramáticas
-    if (rimLightRef.current) {
-      rimLightRef.current.position.x = rimLight.baseX + Math.cos(time * rimLight.oscillationSpeed) * rimLight.xAmplitude;
-      rimLightRef.current.intensity = rimLight.intensityBase + Math.sin(time * rimLight.intensitySpeed) * rimLight.intensityAmplitude;
+    if (state.scene?.fog instanceof THREE.FogExp2) {
+      state.scene.fog.density = 0.025 - litRatio * 0.0135;
+    }
+    if (state.gl && 'toneMappingExposure' in state.gl) {
+      state.gl.toneMappingExposure = 1.0 + litRatio * 0.3;
     }
   });
 
   return (
     <group>
-      {/* ===== SISTEMA DE ILUMINACIÓN CINEMATOGRÁFICA PARA EL MODELO 3D ===== */}
-      
-      {/* Luz principal (Key Light) - Define la forma y volumen del objeto */}
-      <directionalLight 
+      {/* Moody low ambient at entrance; rises as more corridor bays switch ON */}
+      <ambientLight ref={ambientRef} intensity={0.14} color="#d8e2f0" />
+      <hemisphereLight ref={hemiRef} args={['#b8c7ff', '#261a12', 0.2]} />
+
+      {/* Entrance key light (no shadow map — lighting is baked in Cycles) */}
+      <directionalLight
         ref={keyLightRef}
-        position={[3, 4, 5]}              // X: 3 (derecha), Y: 4 (altura media), Z: 5 (delante)
-        intensity={1.2}                   // Intensidad reducida para ser más sutil
-        color="#FFD700"                   // Color: Amarillo dorado
-        castShadow                        // Propiedad: Proyecta sombras
-        shadow-mapSize-width={1024}       // Propiedad: Resolución de sombras (ancho)
-        shadow-mapSize-height={1024}      // Propiedad: Resolución de sombras (alto)
-      />
-      
-      {/* Luz de relleno (Fill Light) - Suaviza las sombras duras */}
-      <directionalLight 
-        ref={fillLightRef}
-        position={[-2, 2, 3]}             // X: -2 (izquierda), Y: 2 (altura baja), Z: 3 (delante)
-        intensity={0.6}                   // Intensidad reducida
-        color="#FFFFE0"                   // Color: Amarillo claro
-      />
-      
-      {/* Luz de contorno (Rim Light) - Crea halo de luz alrededor del objeto */}
-      <directionalLight 
-        ref={rimLightRef}
-        position={[-4, 3, -2]}            // X: -4 (izquierda), Y: 3 (altura media), Z: -2 (atrás)
-        intensity={0.8}                   // Intensidad reducida
-        color="#FFD700"                   // Color: Amarillo dorado
-      />
-      
-     
-
- 
-     
-      {/* Luz hemisférica - Crea gradiente de color en sombras */}
-      <hemisphereLight 
-        args={["#FFD700", "#FFFFE0", 0.4]} // Intensidad reducida a 0.4
+        position={[4, 9, 6]}
+        intensity={0.5}
+        color="#ffd8a8"
       />
 
-      {/* ===== SISTEMA DE ILUMINACIÓN DEL PASILLO (LUCES DIRECCIONALES POR SECCIÓN) ===== */}
-      
-      {/* Direccional 1: Sección INICIO */}
-      <directionalLight
-        ref={hallwaySpotlight1}
-        position={[0, 10, 0]}              // X: 0 (centro), Y: 10 (alto), Z: 2 (entrada del pasillo)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
-      
-      {/* Direccional 2: Sección SOBRE MÍ */}
-      <directionalLight
-        ref={hallwaySpotlight2}
-        position={[0, 10, -2]}             // X: 0 (centro), Y: 10 (alto), Z: -2 (primera estación)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
-      
-      {/* Direccional 3: Sección PROYECTOS */}
-      <directionalLight
-        ref={hallwaySpotlight3}
-        position={[3, 10, -8]}             // X: 3 (derecha), Y: 10 (alto), Z: -8 (segunda estación)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
-      
-      {/* Direccional 4: Sección HABILIDADES */}
-      <directionalLight
-        ref={hallwaySpotlight4}
-        position={[0, 10, -20]}            // X: 0 (centro), Y: 10 (alto), Z: -20 (tercera estación)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
-      
-      {/* Direccional 5: Sección CONTACTO */}
-      <directionalLight
-        ref={hallwaySpotlight5}
-        position={[0, 10, -30]}            // X: 0 (centro), Y: 10 (alto), Z: -33 (cuarta estación)
-        intensity={.5}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
-      
-      {/* Direccional 6: Sección CV */}
-      <directionalLight
-        position={[0, 10, -60]}            // X: 0 (centro), Y: 8 (alto), Z: -60 (final del pasillo)
-        intensity={1}                      // Propiedad: Intensidad baja
-        color="#FFFFFF"                    // Propiedad: Color lavanda místico
-      />
+      {/* Motion-sensor corridor bay lights that switch ON sequentially as the camera advances */}
+      {CORRIDOR_BAYS.map((bay, idx) => (
+        <pointLight
+          key={bay.position[2]}
+          ref={(el) => {
+            bayRefs.current[idx] = el;
+          }}
+          position={bay.position}
+          intensity={idx === 0 ? bay.maxIntensity : 0}
+          distance={bay.distance}
+          decay={1.7}
+          color={bay.color}
+        />
+      ))}
     </group>
   );
 };
@@ -226,57 +224,88 @@ const LightsComponent: React.FC = () => {
 const Lights = React.memo(LightsComponent);
 Lights.displayName = 'Lights';
 
-// ===== CAMERA POSITIONS CONFIGURATION =====
-// Defines where the camera is positioned for each section of the hallway
-// All positions are at person height (y: 1.5) and centered (x: 0)
-const cameraPositions: CameraPositions = {
-  home:      { x: 0,  y: 5, z: 2 },    // X: 0 (center), Y: 1.5 (person height), Z: 2 (hallway entrance)
-  "about-me":  { x: 0,  y: 1.5, z: -3 },   // X: 0 (center), Y: 1.5 (person height), Z: -2 (first station)
-  projects:   { x: 0,  y: 6, z: -12 },   // X: 0 (center), Y: 1.5 (person height), Z: -8 (second station)
-  skills: { x: 0,  y: 4, z: -20 },  // X: 0 (center), Y: 1.5 (person height), Z: -20 (third station)
-  contact:    { x: 0,  y: 1.5, z: -50 },  // X: 0 (center), Y: 1.5 (person height), Z: -50 (fourth station)
-  cv:          { x: 0,  y: 5, z: -50 }   // X: 0 (center), Y: 1.5 (person height), Z: -50 (end of the hallway)
-};
-
-// ===== CONTROLADOR DE CÁMARA =====
-// Componente que escucha eventos de navegación y mueve la cámara entre secciones
 const CameraControllerComponent: React.FC = () => {
-  const { camera } = useThree(); // Hook para acceder a la cámara de Three.js
+  const stateRef = useRef({
+    mouseX: 0,
+    mouseY: 0,
+    movementFactor: 0,
+    lastProgress: scrollStore.currentProgress,
+    swayPhase: 0,
+  });
+
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const lookTargetRef = useRef(new THREE.Vector3());
 
   useEffect(() => {
-    // Función que maneja los eventos de navegación de la cámara
-    const handleCameraNavigation = (event: Event) => {
-      const customEvent = event as CameraNavigationEvent;
-      const { section } = customEvent.detail; // Obtiene el nombre de la sección
-      const position = cameraPositions[section]; // Busca la posición correspondiente
-      
-      if (!position) return; // Si no existe la sección, no hace nada
-
-      // Animación suave de la cámara usando GSAP
-      gsap.to(camera.position, {
-        x: position.x,                    // Propiedad: Posición X final
-        y: position.y,                    // Propiedad: Posición Y final  
-        z: position.z,                    // Propiedad: Posición Z final
-        duration: 1.2,                    // Propiedad: Duración de la animación (1.2 segundos)
-        ease: "power2.inOut",             // Propiedad: Curva de suavizado (aceleración y desaceleración)
-        onUpdate: () => {
-          // Función que se ejecuta en cada frame de la animación
-          // Hace que la cámara siempre mire hacia adelante en el pasillo
-          camera.lookAt(camera.position.x, camera.position.y, camera.position.z - 5);
-        }
-      });
+    const handlePointerMove = (e: PointerEvent) => {
+      stateRef.current.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      stateRef.current.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    return () => window.removeEventListener('pointermove', handlePointerMove);
+  }, []);
 
-    // Registra el listener para el evento personalizado 'camera-navigation'
-    window.addEventListener('camera-navigation', handleCameraNavigation);
-    
-    // Función de limpieza que se ejecuta cuando el componente se desmonta
-    return () => {
-      window.removeEventListener('camera-navigation', handleCameraNavigation);
-    };
-  }, [camera]); // Dependencia: se ejecuta cuando cambia la cámara
+  useFrame((state, delta) => {
+    const { camera } = state;
+    const p = scrollStore.currentProgress;
+    const paused = scrollStore.motionPaused;
 
-  return null; // Este componente no renderiza nada visual
+    const clampedDelta = Math.min(Math.max(delta, 0.0001), 0.05);
+
+    // Continuous velocity in sections/second (frame-rate independent, no binary threshold jitter)
+    const velocity = Math.abs(p - stateRef.current.lastProgress) / clampedDelta;
+    stateRef.current.lastProgress = p;
+
+    const targetFactor = paused ? 0.0 : Math.min(1.0, velocity / 0.9);
+    const mfAlpha = 1 - Math.exp(-5.0 * clampedDelta);
+    stateRef.current.movementFactor += (targetFactor - stateRef.current.movementFactor) * mfAlpha;
+
+    const waypoint = getInterpolatedWaypoint(p);
+
+    // Subtle organic gimbal sway via continuous phase integration (prevents FM-chirp vibration)
+    let swayX = 0;
+    let swayY = 0;
+    if (!paused) {
+      const mf = stateRef.current.movementFactor;
+      const speed = 0.95 * (1 - mf) + 2.35 * mf;
+      stateRef.current.swayPhase = (stateRef.current.swayPhase + speed * clampedDelta) % (Math.PI * 200);
+      const phase = stateRef.current.swayPhase;
+      const ampX = 0.032 * (1 - mf) + 0.055 * mf;
+      const ampY = 0.02 * (1 - mf) + 0.035 * mf;
+      swayX = Math.sin(phase) * ampX;
+      swayY = Math.cos(phase * 2) * ampY;
+    }
+
+    // Frame-rate-independent damped mouse parallax
+    const targetMx = paused ? 0 : stateRef.current.mouseX;
+    const targetMy = paused ? 0 : stateRef.current.mouseY;
+    const mouseAlpha = 1 - Math.exp(-3.6 * clampedDelta);
+    mousePosRef.current.x += (targetMx - mousePosRef.current.x) * mouseAlpha;
+    mousePosRef.current.y += (targetMy - mousePosRef.current.y) * mouseAlpha;
+
+    const parallaxX = mousePosRef.current.x * 0.42;
+    const parallaxY = mousePosRef.current.y * 0.22;
+
+    camera.position.set(
+      waypoint.x + swayX + parallaxX,
+      waypoint.y + swayY + parallaxY,
+      waypoint.z
+    );
+
+    lookTargetRef.current.set(
+      waypoint.lookX + parallaxX * 0.35,
+      waypoint.lookY + parallaxY * 0.35,
+      waypoint.z - 8.5
+    );
+    camera.lookAt(lookTargetRef.current);
+    // Sync matrixWorld immediately so cursor fire raycasting reads the current frame's camera
+    camera.updateMatrixWorld();
+
+    // Expose live corridor Z depth for the architectural HUD telemetry without React rerenders
+    scrollStore.cameraZ = camera.position.z;
+  });
+
+  return null;
 };
 
 const CameraController = React.memo(CameraControllerComponent);
@@ -285,15 +314,19 @@ CameraController.displayName = 'CameraController';
 const Scene: React.FC = () => {
   return (
     <>
-
-      <PerspectiveCamera makeDefault position={[0, 1.5, 2]} fov={75} near={0.1} far={1000} />
+      <PerspectiveCamera makeDefault position={[0.35, 2.35, 2]} fov={60} near={0.1} far={180} />
+      <Suspense fallback={null}>
+        <ProceduralIBL />
+      </Suspense>
       <Lights />
-      <EnvironmentModel />
+      <Suspense fallback={null}>
+        <EnvironmentModel />
+      </Suspense>
+      <Suspense fallback={null}>
+        <RunnerCharacter />
+      </Suspense>
       <CameraController />
       <Particles />
-
-      {/* Efectos de post-procesamiento */}
-
     </>
   );
 };
